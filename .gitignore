@@ -1,0 +1,19 @@
+# Entorno
+.venv/
+.env
+
+# Artefactos del modelo (se copian desde el repo de entrenamiento)
+ml/artifacts/*
+!ml/artifacts/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Editor / SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,18 @@
+# Datos y ML
+pandas==3.0.6
+numpy==2.5.4
+scikit-learn==1.9.1
+xgboost==3.4.1
+joblib==1.6.0
+
+# API
+fastapi==0.143.1
+pydantic==2.14.1
+pydantic-settings==2.16.0
+uvicorn==0.54.0
+python-multipart==0.0.32
+
+# Desarrollo y tests
+pytest==9.1.1
+httpx2==2.13.1
+ruff==0.17.0
