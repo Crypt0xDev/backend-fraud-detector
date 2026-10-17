@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 import joblib
+from pydantic import BaseModel, ValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +23,6 @@ def load_model(
     if not path.exists():
         logger.warning("No se encontró el modelo en %s", path)
         return None
-    # joblib usa pickle: cargar un archivo alterado ejecutaría código arbitrario
     if expected_sha256 and file_sha256(path) != expected_sha256.strip().lower():
         logger.error("El hash SHA-256 de %s no coincide con MODEL_SHA256", path)
         return None
@@ -49,7 +49,7 @@ def load_model(
     return model
 
 
-def load_metrics(path: Path) -> dict[str, Any] | None:
+def load_metrics[T: BaseModel](path: Path, schema: type[T]) -> T | None:
     if not path.exists():
         logger.warning("No se encontraron las métricas en %s", path)
         return None
@@ -58,7 +58,8 @@ def load_metrics(path: Path) -> dict[str, Any] | None:
     except Exception:
         logger.exception("No se pudieron leer las métricas desde %s", path)
         return None
-    if not isinstance(metrics, dict):
-        logger.error("Las métricas en %s no son un objeto JSON", path)
+    try:
+        return schema.model_validate(metrics)
+    except ValidationError as error:
+        logger.error("Las métricas en %s no son válidas: %s", path, error)
         return None
-    return metrics

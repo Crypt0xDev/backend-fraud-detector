@@ -1,8 +1,9 @@
 from typing import Literal
+from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from app.shared.config import settings
+from config.settings import settings
 
 TransactionType = Literal["CASH_IN", "CASH_OUT", "DEBIT", "PAYMENT", "TRANSFER"]
 
@@ -35,3 +36,5 @@ class Prediction(BaseModel):
 class PredictOut(BaseModel):
     threshold: float
     predictions: list[Prediction]
+    # Solo en /predict/csv cuando el lote se guardó en el historial
+    batch_id: UUID | None = None

@@ -1,8 +1,7 @@
-from typing import Any
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 
-from fastapi import APIRouter, HTTPException, Request, status
-
-from app.model_info.schemas import HealthOut
+from app.model.model_schema import HealthOut, MetricsOut
+from utils.auth import get_current_user
 
 router = APIRouter(tags=["model"])
 
@@ -16,8 +15,13 @@ def health(request: Request) -> HealthOut:
     )
 
 
-@router.get("/metrics")
-def metrics(request: Request) -> dict[str, Any]:
+@router.get(
+    "/metrics",
+    response_model=MetricsOut,
+    response_model_exclude_none=True,
+    dependencies=[Depends(get_current_user)],
+)
+def metrics(request: Request) -> MetricsOut:
     metrics = request.app.state.metrics
     if metrics is None:
         raise HTTPException(
