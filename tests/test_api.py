@@ -1,7 +1,7 @@
 import joblib
 
-from app.shared.model_loader import file_sha256
 from tests.factories import save_pipeline
+from utils.model_loader import file_sha256
 
 
 def get_health(client_with_model_path, path, **kwargs):

@@ -38,3 +38,24 @@ def test_metrics_that_are_not_an_object(client_with_model_path, tmp_path):
         response = client.get("/api/v1/metrics")
 
     assert response.status_code == 503
+
+
+def test_metrics_with_invalid_confusion_matrix(client_with_model_path, tmp_path):
+    path = tmp_path / "metrics.json"
+    path.write_text(json.dumps({"confusion_matrix": [1, 2, 3]}))
+
+    with client_with_model_path(tmp_path / "missing.joblib", path) as client:
+        response = client.get("/api/v1/metrics")
+
+    assert response.status_code == 503
+
+
+def test_metrics_keeps_extra_keys(client_with_model_path, tmp_path):
+    metrics = {"confusion_matrix": [[90, 1], [2, 7]], "n_test": 100}
+    path = tmp_path / "metrics.json"
+    path.write_text(json.dumps(metrics))
+
+    with client_with_model_path(tmp_path / "missing.joblib", path) as client:
+        response = client.get("/api/v1/metrics")
+
+    assert response.json() == metrics

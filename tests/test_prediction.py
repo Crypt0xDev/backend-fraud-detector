@@ -1,7 +1,9 @@
 import pandas as pd
 
-from app.shared.config import settings
-from tests.factories import make_transaction
+from app.prediction.prediction_features import DERIVED_COLUMNS, build_features
+from app.prediction.prediction_schema import Transaction
+from config.settings import settings
+from tests.factories import make_transaction, save_pipeline
 
 
 def test_predict_without_model(client_with_model_path, tmp_path):
@@ -122,3 +124,36 @@ def test_predict_csv_rejects_too_many_rows(
         response = post_csv(client, to_csv([make_transaction()] * 3))
 
     assert response.status_code == 422
+
+
+def test_predict_with_derived_features(client_with_model_path, tmp_path):
+    path = save_pipeline(tmp_path / "pipeline.joblib", extra_columns=DERIVED_COLUMNS)
+
+    with client_with_model_path(path) as client:
+        response = client.post(
+            "/api/v1/predict", json={"transactions": [make_transaction()]}
+        )
+
+    assert response.status_code == 200
+
+
+def test_build_features():
+    transaction = Transaction(**make_transaction(step=25, newbalanceDest=400.0))
+
+    row = build_features([transaction]).iloc[0]
+
+    assert row["errorBalanceOrig"] == 0.0
+    assert row["errorBalanceDest"] == 600.0
+    assert row["hour"] == 1
+
+
+def test_predict_csv_rejects_large_file(
+    client_with_model_path, pipeline_path, monkeypatch
+):
+    monkeypatch.setattr(settings, "max_upload_mb", 1)
+    content = to_csv([make_transaction()]) + b"x" * 1024 * 1024
+
+    with client_with_model_path(pipeline_path) as client:
+        response = post_csv(client, content)
+
+    assert response.status_code == 413
