@@ -1,7 +1,5 @@
 from uuid import UUID
-
-from psycopg.rows import class_row
-from psycopg_pool import ConnectionPool
+from typing import Any
 
 from app.batch.batch_schema import BatchOut
 
@@ -21,10 +19,11 @@ ALTER TABLE batches ENABLE ROW LEVEL SECURITY;
 """
 
 COLUMNS = "id, file_name, total_rows, flagged_rows, threshold, created_at"
+FIELDS = ("id", "file_name", "total_rows", "flagged_rows", "threshold", "created_at")
 
 
 class BatchRepository:
-    def __init__(self, pool: ConnectionPool):
+    def __init__(self, pool: Any):
         self.pool = pool
 
     def init_schema(self) -> None:
@@ -49,20 +48,20 @@ class BatchRepository:
 
     def list(self, username: str, limit: int = 50) -> list[BatchOut]:
         with self.pool.connection() as conn:
-            cursor = conn.cursor(row_factory=class_row(BatchOut))
-            return cursor.execute(
+            rows = conn.execute(
                 f"SELECT {COLUMNS} FROM batches WHERE username = %s "
                 "ORDER BY created_at DESC LIMIT %s",
                 (username, limit),
             ).fetchall()
+            return [BatchOut(**dict(zip(FIELDS, row))) for row in rows]
 
     def get(self, username: str, batch_id: UUID) -> BatchOut | None:
         with self.pool.connection() as conn:
-            cursor = conn.cursor(row_factory=class_row(BatchOut))
-            return cursor.execute(
+            row = conn.execute(
                 f"SELECT {COLUMNS} FROM batches WHERE username = %s AND id = %s",
                 (username, batch_id),
             ).fetchone()
+            return BatchOut(**dict(zip(FIELDS, row))) if row is not None else None
 
     def delete(self, username: str, batch_id: UUID) -> None:
         with self.pool.connection() as conn:
