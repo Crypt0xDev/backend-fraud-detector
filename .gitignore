@@ -5,6 +5,8 @@
 # Artefactos del modelo (se copian desde el repo de entrenamiento)
 ml/artifacts/*
 !ml/artifacts/.gitkeep
+!ml/artifacts/pipeline.joblib
+!ml/artifacts/metrics.json
 
 # Python
 __pycache__/
@@ -17,3 +19,6 @@ __pycache__/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Archivos de lotes
+storage/

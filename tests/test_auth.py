@@ -41,7 +41,7 @@ def test_login_and_me(client):
     assert body["expires_in"] == settings.jwt_expire_minutes * 60
 
     me = client.get("/api/v1/auth/me", headers=auth_header(body["access_token"]))
-    assert me.json() == {"username": "ana"}
+    assert me.json() == {"username": "ana", "role": "user"}
 
 
 @pytest.mark.parametrize(

@@ -3,13 +3,13 @@ from uuid import UUID, uuid4
 
 from app.batch.batch_repository import BatchRepository
 from app.batch.batch_storage import object_paths
-from utils.storage import StorageError, SupabaseStorage
+from utils.storage import FileStorage, StorageError
 
 logger = logging.getLogger(__name__)
 
 
 def save_batch(
-    storage: SupabaseStorage,
+    storage: FileStorage,
     batches: BatchRepository,
     *,
     username: str,

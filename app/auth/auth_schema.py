@@ -2,6 +2,8 @@ from typing import Literal
 
 from pydantic import BaseModel
 
+from app.user.user_schema import Role
+
 
 class TokenOut(BaseModel):
     access_token: str
@@ -11,3 +13,4 @@ class TokenOut(BaseModel):
 
 class UserOut(BaseModel):
     username: str
+    role: Role

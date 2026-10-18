@@ -41,11 +41,31 @@ def test_csv_prediction_is_saved(client):
 def test_list_batches(client):
     batch_id = upload(client).json()["batch_id"]
 
-    batches = client.get("/api/v1/batches").json()
+    page = client.get("/api/v1/batches").json()
 
+    assert page["total"] == 1
+    assert (page["page"], page["page_size"]) == (1, 10)
+    batches = page["items"]
     assert [b["id"] for b in batches] == [batch_id]
     assert batches[0]["file_name"] == "pagos.csv"
     assert batches[0]["total_rows"] == 2
+
+
+def test_list_batches_paginates(client):
+    ids = [upload(client, f"lote{i}.csv").json()["batch_id"] for i in range(3)]
+
+    first = client.get("/api/v1/batches", params={"page_size": 2}).json()
+    second = client.get("/api/v1/batches", params={"page": 2, "page_size": 2}).json()
+    beyond = client.get("/api/v1/batches", params={"page": 3, "page_size": 2}).json()
+
+    assert first["total"] == second["total"] == 3
+    assert [b["id"] for b in first["items"] + second["items"]] == ids[::-1]
+    assert beyond["items"] == []
+
+
+@pytest.mark.parametrize("params", [{"page": 0}, {"page_size": 0}, {"page_size": 101}])
+def test_list_batches_rejects_bad_page(client, params):
+    assert client.get("/api/v1/batches", params=params).status_code == 422
 
 
 def test_batch_file_url(client):
@@ -69,7 +89,7 @@ def test_batches_are_private(client):
     batch_id = upload(client).json()["batch_id"]
     client.app.dependency_overrides[get_current_user] = lambda: "otro"
 
-    assert client.get("/api/v1/batches").json() == []
+    assert client.get("/api/v1/batches").json()["items"] == []
     assert client.get(f"/api/v1/batches/{batch_id}/files/input").status_code == 404
     assert client.delete(f"/api/v1/batches/{batch_id}").status_code == 404
 
@@ -78,7 +98,7 @@ def test_delete_batch(client):
     batch_id = upload(client).json()["batch_id"]
 
     assert client.delete(f"/api/v1/batches/{batch_id}").status_code == 204
-    assert client.get("/api/v1/batches").json() == []
+    assert client.get("/api/v1/batches").json()["items"] == []
     assert client.app.state.storage.objects == {}
 
 
@@ -95,11 +115,11 @@ def test_prediction_survives_storage_failure(client):
 
     assert response.status_code == 200
     assert response.json()["batch_id"] is None
-    assert client.get("/api/v1/batches").json() == []
+    assert client.get("/api/v1/batches").json()["items"] == []
 
 
 def test_history_without_storage(client_with_model_path, pipeline_path, monkeypatch):
-    monkeypatch.setattr(main, "open_storage", lambda *_args: None)
+    monkeypatch.setattr(main, "open_storage", lambda *_args, **_kwargs: None)
 
     with client_with_model_path(pipeline_path) as client:
         assert upload(client).json()["batch_id"] is None

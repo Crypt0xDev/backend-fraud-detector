@@ -38,3 +38,32 @@ def decode_token(token: str) -> str | None:
         return None
     subject = payload.get("sub")
     return subject if isinstance(subject, str) else None
+
+
+DOWNLOAD_TOKEN_TYPE = "download"
+
+
+def create_download_token(path: str, download_name: str, expires_in: int) -> str:
+    """Token de un solo archivo para el almacenamiento local. No tiene `sub`, así que
+    decode_token lo rechaza: no sirve como sesión."""
+    payload = {
+        "typ": DOWNLOAD_TOKEN_TYPE,
+        "path": path,
+        "name": download_name,
+        "exp": datetime.now(UTC) + timedelta(seconds=expires_in),
+    }
+    return jwt.encode(payload, jwt_secret(), algorithm=ALGORITHM)
+
+
+def decode_download_token(token: str) -> tuple[str, str] | None:
+    """(ruta, nombre de descarga) si el token es válido, no expiró y es de descarga."""
+    try:
+        payload = jwt.decode(
+            token, jwt_secret(), algorithms=[ALGORITHM], options={"require": ["exp"]}
+        )
+    except jwt.InvalidTokenError:
+        return None
+    path, name = payload.get("path"), payload.get("name")
+    if payload.get("typ") != DOWNLOAD_TOKEN_TYPE or not isinstance(path, str):
+        return None
+    return path, name if isinstance(name, str) else "archivo.csv"

@@ -1,0 +1,40 @@
+{
+  "version": "v001",
+  "model_name": "XGBoost (PaySim)",
+  "trained_at": "2026-10-17T23:17:25+00:00",
+  "threshold": 0.9895,
+  "roc_auc": 0.9995555862290406,
+  "pr_auc": 0.9981628526251773,
+  "precision": 0.9981696156192801,
+  "recall": 0.995739500912964,
+  "f1": 0.9969530773918343,
+  "accuracy": 0.9999921416020444,
+  "confusion_matrix": [
+    [
+      1270878,
+      3
+    ],
+    [
+      7,
+      1636
+    ]
+  ],
+  "features": [
+    "amount",
+    "oldbalanceOrg",
+    "newbalanceOrig",
+    "oldbalanceDest",
+    "newbalanceDest",
+    "errorBalanceOrig",
+    "errorBalanceDest",
+    "hour",
+    "type"
+  ],
+  "train_rows": 3817572,
+  "test_rows": 1272524,
+  "note": "modelo inicial",
+  "sha256": "32c77e7a972cfb2fbb7de62adc0b423af7c930e819f85af62f2f7f286e0a3680",
+  "model_type": "xgboost",
+  "params": {},
+  "val_pr_auc": 0.9986839719568703
+}

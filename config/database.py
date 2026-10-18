@@ -3,6 +3,7 @@ import logging
 from psycopg_pool import ConnectionPool
 
 from app.batch.batch_repository import BatchRepository
+from app.prediction.prediction_repository import PredictionRepository
 from app.user.user_repository import UserRepository
 
 logger = logging.getLogger(__name__)
@@ -39,3 +40,16 @@ def open_repositories(
     except Exception:
         logger.exception("No se pudieron preparar las tablas")
     return pool, users, batches
+
+
+def open_prediction_repository(
+    pool: ConnectionPool | None,
+) -> PredictionRepository | None:
+    if pool is None:
+        return None
+    predictions = PredictionRepository(pool)
+    try:
+        predictions.init_schema()
+    except Exception:
+        logger.exception("No se pudo preparar la tabla de predicciones")
+    return predictions

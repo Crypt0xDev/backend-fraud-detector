@@ -5,6 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from app.auth.auth_schema import TokenOut, UserOut
 from app.auth.usecases.use_auth_login import InvalidCredentialsError, login
+from app.user.user_schema import DEFAULT_ROLE
 from utils.auth import CurrentUser, Users
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -25,5 +26,5 @@ def login_route(
 
 
 @router.get("/me", response_model=UserOut)
-def me_route(username: CurrentUser) -> UserOut:
-    return UserOut(username=username)
+def me_route(username: CurrentUser, users: Users) -> UserOut:
+    return UserOut(username=username, role=users.get_role(username) or DEFAULT_ROLE)

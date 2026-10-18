@@ -1,8 +1,9 @@
+import numpy as np
 import pandas as pd
 
 from app.prediction.prediction_schema import Transaction
 
-DERIVED_COLUMNS = ("errorBalanceOrig", "errorBalanceDest", "hour")
+DERIVED_COLUMNS = ("errorBalanceOrig", "errorBalanceDest", "amountRatioOrig", "hour")
 AVAILABLE_COLUMNS = (*Transaction.model_fields, *DERIVED_COLUMNS)
 DEFAULT_COLUMNS = [c for c in AVAILABLE_COLUMNS if c not in ("nameOrig", "nameDest")]
 
@@ -12,5 +13,6 @@ def build_features(transactions: list[Transaction]) -> pd.DataFrame:
     return frame.assign(
         errorBalanceOrig=frame.newbalanceOrig + frame.amount - frame.oldbalanceOrg,
         errorBalanceDest=frame.oldbalanceDest + frame.amount - frame.newbalanceDest,
+        amountRatioOrig=frame.amount / np.maximum(frame.oldbalanceOrg, 1.0),
         hour=frame.step % 24,
     )

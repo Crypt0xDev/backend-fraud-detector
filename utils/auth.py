@@ -36,3 +36,19 @@ def get_current_user(
 
 
 CurrentUser = Annotated[str, Depends(get_current_user)]
+
+
+def is_admin(users: UserRepository, username: str) -> bool:
+    return users.get_role(username) == "admin"
+
+
+def get_current_admin(username: CurrentUser, users: Users) -> str:
+    if not is_admin(users, username):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Solo un administrador puede hacer esto",
+        )
+    return username
+
+
+CurrentAdmin = Annotated[str, Depends(get_current_admin)]

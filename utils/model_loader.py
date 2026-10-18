@@ -45,7 +45,7 @@ def load_model(
             )
             return None
 
-    logger.info("Modelo cargado desde %s", path)
+    logger.debug("Modelo cargado desde %s", path)
     return model
 
 
@@ -62,4 +62,15 @@ def load_metrics[T: BaseModel](path: Path, schema: type[T]) -> T | None:
         return schema.model_validate(metrics)
     except ValidationError as error:
         logger.error("Las métricas en %s no son válidas: %s", path, error)
+        return None
+
+
+def load_json(path: Path) -> Any | None:
+    if not path.exists():
+        logger.warning("No se encontró %s", path)
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        logger.exception("No se pudo leer %s", path)
         return None

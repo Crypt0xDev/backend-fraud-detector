@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -10,6 +12,7 @@ from tests.factories import (
     InMemoryUserRepository,
     save_pipeline,
 )
+from tests.prediction_factories import InMemoryPredictionRepository
 from utils.auth import get_current_user
 
 
@@ -20,7 +23,19 @@ def in_memory_services(monkeypatch):
         "open_repositories",
         lambda _url: (None, InMemoryUserRepository(), InMemoryBatchRepository()),
     )
-    monkeypatch.setattr(main, "open_storage", lambda *_args: InMemoryStorage())
+    monkeypatch.setattr(
+        main, "open_storage", lambda *_args, **_kwargs: InMemoryStorage()
+    )
+    monkeypatch.setattr(
+        main, "open_prediction_repository", lambda _pool: InMemoryPredictionRepository()
+    )
+    # Los tests no dependen del .env local
+    monkeypatch.setattr(settings, "fraud_threshold", 0.5)
+    for name in ("admin_username", "admin_password", "user_username", "user_password"):
+        monkeypatch.setattr(settings, name, None)
+    for name in ("sample_path", "experiments_path", "profile_path"):
+        monkeypatch.setattr(settings, name, Path("no-existe") / name)
+    monkeypatch.setattr(settings, "rate_limit_per_minute", 0)
 
 
 @pytest.fixture
