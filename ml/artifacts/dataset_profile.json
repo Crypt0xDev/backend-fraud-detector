@@ -1,0 +1,3843 @@
+{
+  "source": {
+    "dataset": "kaggle:ealaxi/paysim1",
+    "file": "paysim.csv",
+    "bytes": 493534783,
+    "sha256": "16910f90577b0d981bf8ff289714510bb89bc71bff7d3f220f024e287e4eea6b"
+  },
+  "rows": 6362620,
+  "columns": {
+    "step": "int32",
+    "type": "category",
+    "amount": "float64",
+    "nameOrig": "str",
+    "oldbalanceOrg": "float64",
+    "newbalanceOrig": "float64",
+    "nameDest": "str",
+    "oldbalanceDest": "float64",
+    "newbalanceDest": "float64",
+    "isFraud": "int8",
+    "isFlaggedFraud": "int8"
+  },
+  "nulls": {
+    "step": 0,
+    "type": 0,
+    "amount": 0,
+    "nameOrig": 0,
+    "oldbalanceOrg": 0,
+    "newbalanceOrig": 0,
+    "nameDest": 0,
+    "oldbalanceDest": 0,
+    "newbalanceDest": 0,
+    "isFraud": 0,
+    "isFlaggedFraud": 0
+  },
+  "duplicates": 0,
+  "classes": {
+    "legit": 6354407,
+    "fraud": 8213,
+    "fraud_rate": 0.001290820448180152
+  },
+  "by_type": [
+    {
+      "type": "CASH_IN",
+      "rows": 1399284,
+      "frauds": 0,
+      "fraud_rate": 0.0
+    },
+    {
+      "type": "CASH_OUT",
+      "rows": 2237500,
+      "frauds": 4116,
+      "fraud_rate": 0.0018395530726256983
+    },
+    {
+      "type": "DEBIT",
+      "rows": 41432,
+      "frauds": 0,
+      "fraud_rate": 0.0
+    },
+    {
+      "type": "PAYMENT",
+      "rows": 2151495,
+      "frauds": 0,
+      "fraud_rate": 0.0
+    },
+    {
+      "type": "TRANSFER",
+      "rows": 532909,
+      "frauds": 4097,
+      "fraud_rate": 0.007687991758442811
+    }
+  ],
+  "amount_bins": [
+    {
+      "bin": "<100",
+      "legit": 14085,
+      "fraud": 18
+    },
+    {
+      "bin": "100-1k",
+      "legit": 128499,
+      "fraud": 40
+    },
+    {
+      "bin": "1k-10k",
+      "legit": 1143141,
+      "fraud": 220
+    },
+    {
+      "bin": "10k-100k",
+      "legit": 2237824,
+      "fraud": 1429
+    },
+    {
+      "bin": "100k-1M",
+      "legit": 2702938,
+      "fraud": 3800
+    },
+    {
+      "bin": "1M-10M",
+      "legit": 122557,
+      "fraud": 2419
+    },
+    {
+      "bin": ">10M",
+      "legit": 5363,
+      "fraud": 287
+    }
+  ],
+  "by_step": [
+    {
+      "step": 1,
+      "rows": 2708,
+      "frauds": 16
+    },
+    {
+      "step": 2,
+      "rows": 1014,
+      "frauds": 8
+    },
+    {
+      "step": 3,
+      "rows": 552,
+      "frauds": 4
+    },
+    {
+      "step": 4,
+      "rows": 565,
+      "frauds": 10
+    },
+    {
+      "step": 5,
+      "rows": 665,
+      "frauds": 6
+    },
+    {
+      "step": 6,
+      "rows": 1660,
+      "frauds": 22
+    },
+    {
+      "step": 7,
+      "rows": 6837,
+      "frauds": 12
+    },
+    {
+      "step": 8,
+      "rows": 21097,
+      "frauds": 12
+    },
+    {
+      "step": 9,
+      "rows": 37628,
+      "frauds": 19
+    },
+    {
+      "step": 10,
+      "rows": 35991,
+      "frauds": 11
+    },
+    {
+      "step": 11,
+      "rows": 37241,
+      "frauds": 7
+    },
+    {
+      "step": 12,
+      "rows": 36153,
+      "frauds": 14
+    },
+    {
+      "step": 13,
+      "rows": 37515,
+      "frauds": 14
+    },
+    {
+      "step": 14,
+      "rows": 41485,
+      "frauds": 12
+    },
+    {
+      "step": 15,
+      "rows": 44609,
+      "frauds": 20
+    },
+    {
+      "step": 16,
+      "rows": 42471,
+      "frauds": 10
+    },
+    {
+      "step": 17,
+      "rows": 43361,
+      "frauds": 7
+    },
+    {
+      "step": 18,
+      "rows": 49579,
+      "frauds": 16
+    },
+    {
+      "step": 19,
+      "rows": 51352,
+      "frauds": 11
+    },
+    {
+      "step": 20,
+      "rows": 40625,
+      "frauds": 4
+    },
+    {
+      "step": 21,
+      "rows": 19152,
+      "frauds": 5
+    },
+    {
+      "step": 22,
+      "rows": 12635,
+      "frauds": 23
+    },
+    {
+      "step": 23,
+      "rows": 6144,
+      "frauds": 2
+    },
+    {
+      "step": 24,
+      "rows": 3216,
+      "frauds": 6
+    },
+    {
+      "step": 25,
+      "rows": 1598,
+      "frauds": 18
+    },
+    {
+      "step": 26,
+      "rows": 440,
+      "frauds": 12
+    },
+    {
+      "step": 27,
+      "rows": 41,
+      "frauds": 8
+    },
+    {
+      "step": 28,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 29,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 30,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 31,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 32,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 33,
+      "rows": 23616,
+      "frauds": 12
+    },
+    {
+      "step": 34,
+      "rows": 30904,
+      "frauds": 22
+    },
+    {
+      "step": 35,
+      "rows": 29157,
+      "frauds": 15
+    },
+    {
+      "step": 36,
+      "rows": 39774,
+      "frauds": 19
+    },
+    {
+      "step": 37,
+      "rows": 34000,
+      "frauds": 13
+    },
+    {
+      "step": 38,
+      "rows": 31453,
+      "frauds": 16
+    },
+    {
+      "step": 39,
+      "rows": 23391,
+      "frauds": 12
+    },
+    {
+      "step": 40,
+      "rows": 34270,
+      "frauds": 14
+    },
+    {
+      "step": 41,
+      "rows": 36348,
+      "frauds": 12
+    },
+    {
+      "step": 42,
+      "rows": 41304,
+      "frauds": 14
+    },
+    {
+      "step": 43,
+      "rows": 45060,
+      "frauds": 13
+    },
+    {
+      "step": 44,
+      "rows": 38523,
+      "frauds": 8
+    },
+    {
+      "step": 45,
+      "rows": 18500,
+      "frauds": 16
+    },
+    {
+      "step": 46,
+      "rows": 12445,
+      "frauds": 14
+    },
+    {
+      "step": 47,
+      "rows": 8681,
+      "frauds": 21
+    },
+    {
+      "step": 48,
+      "rows": 5693,
+      "frauds": 10
+    },
+    {
+      "step": 49,
+      "rows": 764,
+      "frauds": 4
+    },
+    {
+      "step": 50,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 51,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 52,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 53,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 54,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 55,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 56,
+      "rows": 18,
+      "frauds": 18
+    },
+    {
+      "step": 57,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 58,
+      "rows": 20,
+      "frauds": 20
+    },
+    {
+      "step": 59,
+      "rows": 20,
+      "frauds": 20
+    },
+    {
+      "step": 60,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 61,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 62,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 63,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 64,
+      "rows": 18,
+      "frauds": 18
+    },
+    {
+      "step": 65,
+      "rows": 20,
+      "frauds": 20
+    },
+    {
+      "step": 66,
+      "rows": 24,
+      "frauds": 24
+    },
+    {
+      "step": 67,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 68,
+      "rows": 18,
+      "frauds": 18
+    },
+    {
+      "step": 69,
+      "rows": 20,
+      "frauds": 20
+    },
+    {
+      "step": 70,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 71,
+      "rows": 20,
+      "frauds": 20
+    },
+    {
+      "step": 72,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 73,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 74,
+      "rows": 22,
+      "frauds": 22
+    },
+    {
+      "step": 75,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 76,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 77,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 78,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 79,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 80,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 81,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 82,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 83,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 84,
+      "rows": 16,
+      "frauds": 16
+    },
+    {
+      "step": 85,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 86,
+      "rows": 18,
+      "frauds": 18
+    },
+    {
+      "step": 87,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 88,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 89,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 90,
+      "rows": 16,
+      "frauds": 16
+    },
+    {
+      "step": 91,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 92,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 93,
+      "rows": 4444,
+      "frauds": 16
+    },
+    {
+      "step": 94,
+      "rows": 10372,
+      "frauds": 12
+    },
+    {
+      "step": 95,
+      "rows": 6858,
+      "frauds": 14
+    },
+    {
+      "step": 96,
+      "rows": 6350,
+      "frauds": 4
+    },
+    {
+      "step": 97,
+      "rows": 685,
+      "frauds": 10
+    },
+    {
+      "step": 98,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 99,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 100,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 101,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 102,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 103,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 104,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 105,
+      "rows": 18,
+      "frauds": 18
+    },
+    {
+      "step": 106,
+      "rows": 18,
+      "frauds": 18
+    },
+    {
+      "step": 107,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 108,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 109,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 110,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 111,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 112,
+      "rows": 2,
+      "frauds": 2
+    },
+    {
+      "step": 113,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 114,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 115,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 116,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 117,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 118,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 119,
+      "rows": 5740,
+      "frauds": 10
+    },
+    {
+      "step": 120,
+      "rows": 3144,
+      "frauds": 12
+    },
+    {
+      "step": 121,
+      "rows": 1074,
+      "frauds": 14
+    },
+    {
+      "step": 122,
+      "rows": 414,
+      "frauds": 14
+    },
+    {
+      "step": 123,
+      "rows": 52,
+      "frauds": 6
+    },
+    {
+      "step": 124,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 125,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 126,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 127,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 128,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 129,
+      "rows": 21986,
+      "frauds": 6
+    },
+    {
+      "step": 130,
+      "rows": 32890,
+      "frauds": 6
+    },
+    {
+      "step": 131,
+      "rows": 36375,
+      "frauds": 16
+    },
+    {
+      "step": 132,
+      "rows": 35936,
+      "frauds": 10
+    },
+    {
+      "step": 133,
+      "rows": 35147,
+      "frauds": 10
+    },
+    {
+      "step": 134,
+      "rows": 32391,
+      "frauds": 10
+    },
+    {
+      "step": 135,
+      "rows": 27556,
+      "frauds": 8
+    },
+    {
+      "step": 136,
+      "rows": 30340,
+      "frauds": 10
+    },
+    {
+      "step": 137,
+      "rows": 32559,
+      "frauds": 12
+    },
+    {
+      "step": 138,
+      "rows": 31422,
+      "frauds": 4
+    },
+    {
+      "step": 139,
+      "rows": 46054,
+      "frauds": 4
+    },
+    {
+      "step": 140,
+      "rows": 37012,
+      "frauds": 14
+    },
+    {
+      "step": 141,
+      "rows": 16434,
+      "frauds": 8
+    },
+    {
+      "step": 142,
+      "rows": 12189,
+      "frauds": 8
+    },
+    {
+      "step": 143,
+      "rows": 7609,
+      "frauds": 16
+    },
+    {
+      "step": 144,
+      "rows": 3523,
+      "frauds": 10
+    },
+    {
+      "step": 145,
+      "rows": 1117,
+      "frauds": 14
+    },
+    {
+      "step": 146,
+      "rows": 522,
+      "frauds": 10
+    },
+    {
+      "step": 147,
+      "rows": 84,
+      "frauds": 6
+    },
+    {
+      "step": 148,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 149,
+      "rows": 22,
+      "frauds": 22
+    },
+    {
+      "step": 150,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 151,
+      "rows": 18,
+      "frauds": 18
+    },
+    {
+      "step": 152,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 153,
+      "rows": 19475,
+      "frauds": 10
+    },
+    {
+      "step": 154,
+      "rows": 29241,
+      "frauds": 10
+    },
+    {
+      "step": 155,
+      "rows": 29927,
+      "frauds": 8
+    },
+    {
+      "step": 156,
+      "rows": 27603,
+      "frauds": 18
+    },
+    {
+      "step": 157,
+      "rows": 29764,
+      "frauds": 16
+    },
+    {
+      "step": 158,
+      "rows": 27839,
+      "frauds": 8
+    },
+    {
+      "step": 159,
+      "rows": 27561,
+      "frauds": 10
+    },
+    {
+      "step": 160,
+      "rows": 27765,
+      "frauds": 26
+    },
+    {
+      "step": 161,
+      "rows": 33049,
+      "frauds": 14
+    },
+    {
+      "step": 162,
+      "rows": 40622,
+      "frauds": 10
+    },
+    {
+      "step": 163,
+      "rows": 46352,
+      "frauds": 8
+    },
+    {
+      "step": 164,
+      "rows": 39102,
+      "frauds": 14
+    },
+    {
+      "step": 165,
+      "rows": 16542,
+      "frauds": 4
+    },
+    {
+      "step": 166,
+      "rows": 12176,
+      "frauds": 6
+    },
+    {
+      "step": 167,
+      "rows": 7946,
+      "frauds": 6
+    },
+    {
+      "step": 168,
+      "rows": 3824,
+      "frauds": 2
+    },
+    {
+      "step": 169,
+      "rows": 1464,
+      "frauds": 10
+    },
+    {
+      "step": 170,
+      "rows": 529,
+      "frauds": 16
+    },
+    {
+      "step": 171,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 172,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 173,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 174,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 175,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 176,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 177,
+      "rows": 17336,
+      "frauds": 18
+    },
+    {
+      "step": 178,
+      "rows": 28204,
+      "frauds": 14
+    },
+    {
+      "step": 179,
+      "rows": 30534,
+      "frauds": 8
+    },
+    {
+      "step": 180,
+      "rows": 31481,
+      "frauds": 10
+    },
+    {
+      "step": 181,
+      "rows": 31749,
+      "frauds": 11
+    },
+    {
+      "step": 182,
+      "rows": 31900,
+      "frauds": 8
+    },
+    {
+      "step": 183,
+      "rows": 31199,
+      "frauds": 16
+    },
+    {
+      "step": 184,
+      "rows": 32175,
+      "frauds": 8
+    },
+    {
+      "step": 185,
+      "rows": 37323,
+      "frauds": 16
+    },
+    {
+      "step": 186,
+      "rows": 43747,
+      "frauds": 17
+    },
+    {
+      "step": 187,
+      "rows": 49083,
+      "frauds": 10
+    },
+    {
+      "step": 188,
+      "rows": 39079,
+      "frauds": 10
+    },
+    {
+      "step": 189,
+      "rows": 17674,
+      "frauds": 10
+    },
+    {
+      "step": 190,
+      "rows": 12669,
+      "frauds": 8
+    },
+    {
+      "step": 191,
+      "rows": 9111,
+      "frauds": 12
+    },
+    {
+      "step": 192,
+      "rows": 4314,
+      "frauds": 10
+    },
+    {
+      "step": 193,
+      "rows": 1511,
+      "frauds": 8
+    },
+    {
+      "step": 194,
+      "rows": 671,
+      "frauds": 12
+    },
+    {
+      "step": 195,
+      "rows": 141,
+      "frauds": 10
+    },
+    {
+      "step": 196,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 197,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 198,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 199,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 200,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 201,
+      "rows": 17963,
+      "frauds": 8
+    },
+    {
+      "step": 202,
+      "rows": 31949,
+      "frauds": 2
+    },
+    {
+      "step": 203,
+      "rows": 36176,
+      "frauds": 8
+    },
+    {
+      "step": 204,
+      "rows": 36856,
+      "frauds": 6
+    },
+    {
+      "step": 205,
+      "rows": 33549,
+      "frauds": 16
+    },
+    {
+      "step": 206,
+      "rows": 29777,
+      "frauds": 12
+    },
+    {
+      "step": 207,
+      "rows": 28288,
+      "frauds": 6
+    },
+    {
+      "step": 208,
+      "rows": 29058,
+      "frauds": 21
+    },
+    {
+      "step": 209,
+      "rows": 30372,
+      "frauds": 6
+    },
+    {
+      "step": 210,
+      "rows": 33004,
+      "frauds": 8
+    },
+    {
+      "step": 211,
+      "rows": 36889,
+      "frauds": 14
+    },
+    {
+      "step": 212,
+      "rows": 34047,
+      "frauds": 40
+    },
+    {
+      "step": 213,
+      "rows": 14775,
+      "frauds": 8
+    },
+    {
+      "step": 214,
+      "rows": 10746,
+      "frauds": 12
+    },
+    {
+      "step": 215,
+      "rows": 7975,
+      "frauds": 10
+    },
+    {
+      "step": 216,
+      "rows": 4130,
+      "frauds": 6
+    },
+    {
+      "step": 217,
+      "rows": 3347,
+      "frauds": 16
+    },
+    {
+      "step": 218,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 219,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 220,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 221,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 222,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 223,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 224,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 225,
+      "rows": 18366,
+      "frauds": 12
+    },
+    {
+      "step": 226,
+      "rows": 27522,
+      "frauds": 12
+    },
+    {
+      "step": 227,
+      "rows": 30871,
+      "frauds": 14
+    },
+    {
+      "step": 228,
+      "rows": 30965,
+      "frauds": 16
+    },
+    {
+      "step": 229,
+      "rows": 28304,
+      "frauds": 8
+    },
+    {
+      "step": 230,
+      "rows": 26034,
+      "frauds": 17
+    },
+    {
+      "step": 231,
+      "rows": 26968,
+      "frauds": 17
+    },
+    {
+      "step": 232,
+      "rows": 27482,
+      "frauds": 10
+    },
+    {
+      "step": 233,
+      "rows": 14703,
+      "frauds": 12
+    },
+    {
+      "step": 234,
+      "rows": 34053,
+      "frauds": 14
+    },
+    {
+      "step": 235,
+      "rows": 47491,
+      "frauds": 10
+    },
+    {
+      "step": 236,
+      "rows": 37109,
+      "frauds": 10
+    },
+    {
+      "step": 237,
+      "rows": 16003,
+      "frauds": 12
+    },
+    {
+      "step": 238,
+      "rows": 10920,
+      "frauds": 14
+    },
+    {
+      "step": 239,
+      "rows": 8554,
+      "frauds": 10
+    },
+    {
+      "step": 240,
+      "rows": 4189,
+      "frauds": 14
+    },
+    {
+      "step": 241,
+      "rows": 1865,
+      "frauds": 18
+    },
+    {
+      "step": 242,
+      "rows": 637,
+      "frauds": 8
+    },
+    {
+      "step": 243,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 244,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 245,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 246,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 247,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 248,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 249,
+      "rows": 23209,
+      "frauds": 28
+    },
+    {
+      "step": 250,
+      "rows": 31854,
+      "frauds": 22
+    },
+    {
+      "step": 251,
+      "rows": 35269,
+      "frauds": 10
+    },
+    {
+      "step": 252,
+      "rows": 35590,
+      "frauds": 2
+    },
+    {
+      "step": 253,
+      "rows": 33311,
+      "frauds": 10
+    },
+    {
+      "step": 254,
+      "rows": 29553,
+      "frauds": 10
+    },
+    {
+      "step": 255,
+      "rows": 28840,
+      "frauds": 8
+    },
+    {
+      "step": 256,
+      "rows": 28570,
+      "frauds": 8
+    },
+    {
+      "step": 257,
+      "rows": 26843,
+      "frauds": 6
+    },
+    {
+      "step": 258,
+      "rows": 27662,
+      "frauds": 8
+    },
+    {
+      "step": 259,
+      "rows": 43328,
+      "frauds": 10
+    },
+    {
+      "step": 260,
+      "rows": 33674,
+      "frauds": 12
+    },
+    {
+      "step": 261,
+      "rows": 14420,
+      "frauds": 20
+    },
+    {
+      "step": 262,
+      "rows": 11125,
+      "frauds": 22
+    },
+    {
+      "step": 263,
+      "rows": 8021,
+      "frauds": 6
+    },
+    {
+      "step": 264,
+      "rows": 4042,
+      "frauds": 8
+    },
+    {
+      "step": 265,
+      "rows": 1581,
+      "frauds": 12
+    },
+    {
+      "step": 266,
+      "rows": 767,
+      "frauds": 10
+    },
+    {
+      "step": 267,
+      "rows": 77,
+      "frauds": 8
+    },
+    {
+      "step": 268,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 269,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 270,
+      "rows": 16,
+      "frauds": 16
+    },
+    {
+      "step": 271,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 272,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 273,
+      "rows": 7871,
+      "frauds": 20
+    },
+    {
+      "step": 274,
+      "rows": 19202,
+      "frauds": 20
+    },
+    {
+      "step": 275,
+      "rows": 24797,
+      "frauds": 10
+    },
+    {
+      "step": 276,
+      "rows": 26383,
+      "frauds": 10
+    },
+    {
+      "step": 277,
+      "rows": 25925,
+      "frauds": 14
+    },
+    {
+      "step": 278,
+      "rows": 25737,
+      "frauds": 4
+    },
+    {
+      "step": 279,
+      "rows": 25925,
+      "frauds": 22
+    },
+    {
+      "step": 280,
+      "rows": 25956,
+      "frauds": 4
+    },
+    {
+      "step": 281,
+      "rows": 27778,
+      "frauds": 18
+    },
+    {
+      "step": 282,
+      "rows": 31118,
+      "frauds": 18
+    },
+    {
+      "step": 283,
+      "rows": 36644,
+      "frauds": 8
+    },
+    {
+      "step": 284,
+      "rows": 33449,
+      "frauds": 16
+    },
+    {
+      "step": 285,
+      "rows": 14266,
+      "frauds": 16
+    },
+    {
+      "step": 286,
+      "rows": 11333,
+      "frauds": 8
+    },
+    {
+      "step": 287,
+      "rows": 6889,
+      "frauds": 10
+    },
+    {
+      "step": 288,
+      "rows": 4018,
+      "frauds": 10
+    },
+    {
+      "step": 289,
+      "rows": 1437,
+      "frauds": 12
+    },
+    {
+      "step": 290,
+      "rows": 487,
+      "frauds": 8
+    },
+    {
+      "step": 291,
+      "rows": 44,
+      "frauds": 10
+    },
+    {
+      "step": 292,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 293,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 294,
+      "rows": 18,
+      "frauds": 18
+    },
+    {
+      "step": 295,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 296,
+      "rows": 22,
+      "frauds": 22
+    },
+    {
+      "step": 297,
+      "rows": 20609,
+      "frauds": 8
+    },
+    {
+      "step": 298,
+      "rows": 29579,
+      "frauds": 4
+    },
+    {
+      "step": 299,
+      "rows": 31940,
+      "frauds": 10
+    },
+    {
+      "step": 300,
+      "rows": 31176,
+      "frauds": 8
+    },
+    {
+      "step": 301,
+      "rows": 30881,
+      "frauds": 4
+    },
+    {
+      "step": 302,
+      "rows": 29127,
+      "frauds": 8
+    },
+    {
+      "step": 303,
+      "rows": 24714,
+      "frauds": 14
+    },
+    {
+      "step": 304,
+      "rows": 26697,
+      "frauds": 2
+    },
+    {
+      "step": 305,
+      "rows": 34595,
+      "frauds": 14
+    },
+    {
+      "step": 306,
+      "rows": 43615,
+      "frauds": 12
+    },
+    {
+      "step": 307,
+      "rows": 46968,
+      "frauds": 16
+    },
+    {
+      "step": 308,
+      "rows": 36983,
+      "frauds": 6
+    },
+    {
+      "step": 309,
+      "rows": 15147,
+      "frauds": 8
+    },
+    {
+      "step": 310,
+      "rows": 11393,
+      "frauds": 10
+    },
+    {
+      "step": 311,
+      "rows": 9863,
+      "frauds": 16
+    },
+    {
+      "step": 312,
+      "rows": 3266,
+      "frauds": 10
+    },
+    {
+      "step": 313,
+      "rows": 1305,
+      "frauds": 10
+    },
+    {
+      "step": 314,
+      "rows": 512,
+      "frauds": 6
+    },
+    {
+      "step": 315,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 316,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 317,
+      "rows": 20,
+      "frauds": 20
+    },
+    {
+      "step": 318,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 319,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 320,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 321,
+      "rows": 17768,
+      "frauds": 8
+    },
+    {
+      "step": 322,
+      "rows": 27147,
+      "frauds": 16
+    },
+    {
+      "step": 323,
+      "rows": 29884,
+      "frauds": 10
+    },
+    {
+      "step": 324,
+      "rows": 29430,
+      "frauds": 10
+    },
+    {
+      "step": 325,
+      "rows": 27901,
+      "frauds": 10
+    },
+    {
+      "step": 326,
+      "rows": 26655,
+      "frauds": 14
+    },
+    {
+      "step": 327,
+      "rows": 25183,
+      "frauds": 10
+    },
+    {
+      "step": 328,
+      "rows": 26877,
+      "frauds": 18
+    },
+    {
+      "step": 329,
+      "rows": 32161,
+      "frauds": 6
+    },
+    {
+      "step": 330,
+      "rows": 36682,
+      "frauds": 10
+    },
+    {
+      "step": 331,
+      "rows": 40186,
+      "frauds": 6
+    },
+    {
+      "step": 332,
+      "rows": 36156,
+      "frauds": 6
+    },
+    {
+      "step": 333,
+      "rows": 14553,
+      "frauds": 8
+    },
+    {
+      "step": 334,
+      "rows": 12016,
+      "frauds": 4
+    },
+    {
+      "step": 335,
+      "rows": 10456,
+      "frauds": 4
+    },
+    {
+      "step": 336,
+      "rows": 2932,
+      "frauds": 18
+    },
+    {
+      "step": 337,
+      "rows": 320,
+      "frauds": 10
+    },
+    {
+      "step": 338,
+      "rows": 529,
+      "frauds": 4
+    },
+    {
+      "step": 339,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 340,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 341,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 342,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 343,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 344,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 345,
+      "rows": 14670,
+      "frauds": 12
+    },
+    {
+      "step": 346,
+      "rows": 26073,
+      "frauds": 6
+    },
+    {
+      "step": 347,
+      "rows": 30222,
+      "frauds": 0
+    },
+    {
+      "step": 348,
+      "rows": 29467,
+      "frauds": 8
+    },
+    {
+      "step": 349,
+      "rows": 29552,
+      "frauds": 18
+    },
+    {
+      "step": 350,
+      "rows": 28245,
+      "frauds": 14
+    },
+    {
+      "step": 351,
+      "rows": 26927,
+      "frauds": 18
+    },
+    {
+      "step": 352,
+      "rows": 27139,
+      "frauds": 16
+    },
+    {
+      "step": 353,
+      "rows": 30420,
+      "frauds": 8
+    },
+    {
+      "step": 354,
+      "rows": 40696,
+      "frauds": 12
+    },
+    {
+      "step": 355,
+      "rows": 44787,
+      "frauds": 8
+    },
+    {
+      "step": 356,
+      "rows": 33528,
+      "frauds": 6
+    },
+    {
+      "step": 357,
+      "rows": 15096,
+      "frauds": 18
+    },
+    {
+      "step": 358,
+      "rows": 12050,
+      "frauds": 10
+    },
+    {
+      "step": 359,
+      "rows": 7991,
+      "frauds": 12
+    },
+    {
+      "step": 360,
+      "rows": 3508,
+      "frauds": 8
+    },
+    {
+      "step": 361,
+      "rows": 1441,
+      "frauds": 14
+    },
+    {
+      "step": 362,
+      "rows": 504,
+      "frauds": 20
+    },
+    {
+      "step": 363,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 364,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 365,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 366,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 367,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 368,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 369,
+      "rows": 14490,
+      "frauds": 6
+    },
+    {
+      "step": 370,
+      "rows": 25429,
+      "frauds": 18
+    },
+    {
+      "step": 371,
+      "rows": 28388,
+      "frauds": 6
+    },
+    {
+      "step": 372,
+      "rows": 29515,
+      "frauds": 8
+    },
+    {
+      "step": 373,
+      "rows": 28853,
+      "frauds": 12
+    },
+    {
+      "step": 374,
+      "rows": 27727,
+      "frauds": 14
+    },
+    {
+      "step": 375,
+      "rows": 26103,
+      "frauds": 10
+    },
+    {
+      "step": 376,
+      "rows": 20122,
+      "frauds": 4
+    },
+    {
+      "step": 377,
+      "rows": 18183,
+      "frauds": 10
+    },
+    {
+      "step": 378,
+      "rows": 37127,
+      "frauds": 4
+    },
+    {
+      "step": 379,
+      "rows": 41759,
+      "frauds": 16
+    },
+    {
+      "step": 380,
+      "rows": 37693,
+      "frauds": 14
+    },
+    {
+      "step": 381,
+      "rows": 14961,
+      "frauds": 4
+    },
+    {
+      "step": 382,
+      "rows": 11829,
+      "frauds": 8
+    },
+    {
+      "step": 383,
+      "rows": 7818,
+      "frauds": 14
+    },
+    {
+      "step": 384,
+      "rows": 3588,
+      "frauds": 6
+    },
+    {
+      "step": 385,
+      "rows": 1419,
+      "frauds": 8
+    },
+    {
+      "step": 386,
+      "rows": 633,
+      "frauds": 16
+    },
+    {
+      "step": 387,
+      "rows": 28,
+      "frauds": 28
+    },
+    {
+      "step": 388,
+      "rows": 18,
+      "frauds": 18
+    },
+    {
+      "step": 389,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 390,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 391,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 392,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 393,
+      "rows": 19269,
+      "frauds": 4
+    },
+    {
+      "step": 394,
+      "rows": 28959,
+      "frauds": 10
+    },
+    {
+      "step": 395,
+      "rows": 22797,
+      "frauds": 8
+    },
+    {
+      "step": 396,
+      "rows": 34075,
+      "frauds": 8
+    },
+    {
+      "step": 397,
+      "rows": 30348,
+      "frauds": 10
+    },
+    {
+      "step": 398,
+      "rows": 26656,
+      "frauds": 26
+    },
+    {
+      "step": 399,
+      "rows": 30223,
+      "frauds": 12
+    },
+    {
+      "step": 400,
+      "rows": 30910,
+      "frauds": 16
+    },
+    {
+      "step": 401,
+      "rows": 33468,
+      "frauds": 16
+    },
+    {
+      "step": 402,
+      "rows": 40218,
+      "frauds": 12
+    },
+    {
+      "step": 403,
+      "rows": 45155,
+      "frauds": 16
+    },
+    {
+      "step": 404,
+      "rows": 36726,
+      "frauds": 18
+    },
+    {
+      "step": 405,
+      "rows": 16604,
+      "frauds": 10
+    },
+    {
+      "step": 406,
+      "rows": 12023,
+      "frauds": 24
+    },
+    {
+      "step": 407,
+      "rows": 7937,
+      "frauds": 6
+    },
+    {
+      "step": 408,
+      "rows": 8256,
+      "frauds": 10
+    },
+    {
+      "step": 409,
+      "rows": 483,
+      "frauds": 20
+    },
+    {
+      "step": 410,
+      "rows": 20,
+      "frauds": 20
+    },
+    {
+      "step": 411,
+      "rows": 16,
+      "frauds": 16
+    },
+    {
+      "step": 412,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 413,
+      "rows": 289,
+      "frauds": 14
+    },
+    {
+      "step": 414,
+      "rows": 16,
+      "frauds": 16
+    },
+    {
+      "step": 415,
+      "rows": 16,
+      "frauds": 16
+    },
+    {
+      "step": 416,
+      "rows": 2182,
+      "frauds": 8
+    },
+    {
+      "step": 417,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 418,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 419,
+      "rows": 1257,
+      "frauds": 10
+    },
+    {
+      "step": 420,
+      "rows": 2620,
+      "frauds": 12
+    },
+    {
+      "step": 421,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 422,
+      "rows": 1259,
+      "frauds": 10
+    },
+    {
+      "step": 423,
+      "rows": 766,
+      "frauds": 6
+    },
+    {
+      "step": 424,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 425,
+      "rows": 28,
+      "frauds": 28
+    },
+    {
+      "step": 426,
+      "rows": 5139,
+      "frauds": 2
+    },
+    {
+      "step": 427,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 428,
+      "rows": 2792,
+      "frauds": 6
+    },
+    {
+      "step": 429,
+      "rows": 2357,
+      "frauds": 4
+    },
+    {
+      "step": 430,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 431,
+      "rows": 1685,
+      "frauds": 6
+    },
+    {
+      "step": 432,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 433,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 434,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 435,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 436,
+      "rows": 248,
+      "frauds": 16
+    },
+    {
+      "step": 437,
+      "rows": 16,
+      "frauds": 16
+    },
+    {
+      "step": 438,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 439,
+      "rows": 883,
+      "frauds": 12
+    },
+    {
+      "step": 440,
+      "rows": 18,
+      "frauds": 18
+    },
+    {
+      "step": 441,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 442,
+      "rows": 1222,
+      "frauds": 12
+    },
+    {
+      "step": 443,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 444,
+      "rows": 20,
+      "frauds": 20
+    },
+    {
+      "step": 445,
+      "rows": 64,
+      "frauds": 6
+    },
+    {
+      "step": 446,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 447,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 448,
+      "rows": 2548,
+      "frauds": 6
+    },
+    {
+      "step": 449,
+      "rows": 1194,
+      "frauds": 6
+    },
+    {
+      "step": 450,
+      "rows": 16,
+      "frauds": 16
+    },
+    {
+      "step": 451,
+      "rows": 3751,
+      "frauds": 4
+    },
+    {
+      "step": 452,
+      "rows": 308,
+      "frauds": 10
+    },
+    {
+      "step": 453,
+      "rows": 59,
+      "frauds": 8
+    },
+    {
+      "step": 454,
+      "rows": 39,
+      "frauds": 6
+    },
+    {
+      "step": 455,
+      "rows": 824,
+      "frauds": 10
+    },
+    {
+      "step": 456,
+      "rows": 18,
+      "frauds": 18
+    },
+    {
+      "step": 457,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 458,
+      "rows": 438,
+      "frauds": 6
+    },
+    {
+      "step": 459,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 460,
+      "rows": 59,
+      "frauds": 16
+    },
+    {
+      "step": 461,
+      "rows": 83,
+      "frauds": 16
+    },
+    {
+      "step": 462,
+      "rows": 16,
+      "frauds": 16
+    },
+    {
+      "step": 463,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 464,
+      "rows": 16,
+      "frauds": 16
+    },
+    {
+      "step": 465,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 466,
+      "rows": 984,
+      "frauds": 6
+    },
+    {
+      "step": 467,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 468,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 469,
+      "rows": 6016,
+      "frauds": 8
+    },
+    {
+      "step": 470,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 471,
+      "rows": 2620,
+      "frauds": 2
+    },
+    {
+      "step": 472,
+      "rows": 84,
+      "frauds": 8
+    },
+    {
+      "step": 473,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 474,
+      "rows": 2728,
+      "frauds": 8
+    },
+    {
+      "step": 475,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 476,
+      "rows": 3755,
+      "frauds": 8
+    },
+    {
+      "step": 477,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 478,
+      "rows": 1908,
+      "frauds": 6
+    },
+    {
+      "step": 479,
+      "rows": 904,
+      "frauds": 4
+    },
+    {
+      "step": 480,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 481,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 482,
+      "rows": 16,
+      "frauds": 16
+    },
+    {
+      "step": 483,
+      "rows": 317,
+      "frauds": 8
+    },
+    {
+      "step": 484,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 485,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 486,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 487,
+      "rows": 912,
+      "frauds": 14
+    },
+    {
+      "step": 488,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 489,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 490,
+      "rows": 3820,
+      "frauds": 10
+    },
+    {
+      "step": 491,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 492,
+      "rows": 5119,
+      "frauds": 6
+    },
+    {
+      "step": 493,
+      "rows": 1819,
+      "frauds": 8
+    },
+    {
+      "step": 494,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 495,
+      "rows": 3256,
+      "frauds": 16
+    },
+    {
+      "step": 496,
+      "rows": 873,
+      "frauds": 6
+    },
+    {
+      "step": 497,
+      "rows": 20,
+      "frauds": 20
+    },
+    {
+      "step": 498,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 499,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 500,
+      "rows": 6108,
+      "frauds": 4
+    },
+    {
+      "step": 501,
+      "rows": 28,
+      "frauds": 28
+    },
+    {
+      "step": 502,
+      "rows": 313,
+      "frauds": 12
+    },
+    {
+      "step": 503,
+      "rows": 1878,
+      "frauds": 10
+    },
+    {
+      "step": 504,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 505,
+      "rows": 936,
+      "frauds": 8
+    },
+    {
+      "step": 506,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 507,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 508,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 509,
+      "rows": 288,
+      "frauds": 14
+    },
+    {
+      "step": 510,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 511,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 512,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 513,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 514,
+      "rows": 8733,
+      "frauds": 14
+    },
+    {
+      "step": 515,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 516,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 517,
+      "rows": 1391,
+      "frauds": 6
+    },
+    {
+      "step": 518,
+      "rows": 3488,
+      "frauds": 8
+    },
+    {
+      "step": 519,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 520,
+      "rows": 3037,
+      "frauds": 12
+    },
+    {
+      "step": 521,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 522,
+      "rows": 18631,
+      "frauds": 14
+    },
+    {
+      "step": 523,
+      "rows": 30,
+      "frauds": 30
+    },
+    {
+      "step": 524,
+      "rows": 2664,
+      "frauds": 4
+    },
+    {
+      "step": 525,
+      "rows": 8023,
+      "frauds": 2
+    },
+    {
+      "step": 526,
+      "rows": 2470,
+      "frauds": 12
+    },
+    {
+      "step": 527,
+      "rows": 2697,
+      "frauds": 6
+    },
+    {
+      "step": 528,
+      "rows": 937,
+      "frauds": 14
+    },
+    {
+      "step": 529,
+      "rows": 33,
+      "frauds": 6
+    },
+    {
+      "step": 530,
+      "rows": 409,
+      "frauds": 8
+    },
+    {
+      "step": 531,
+      "rows": 250,
+      "frauds": 14
+    },
+    {
+      "step": 532,
+      "rows": 95,
+      "frauds": 6
+    },
+    {
+      "step": 533,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 534,
+      "rows": 531,
+      "frauds": 12
+    },
+    {
+      "step": 535,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 536,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 537,
+      "rows": 18,
+      "frauds": 18
+    },
+    {
+      "step": 538,
+      "rows": 3120,
+      "frauds": 10
+    },
+    {
+      "step": 539,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 540,
+      "rows": 5476,
+      "frauds": 6
+    },
+    {
+      "step": 541,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 542,
+      "rows": 4475,
+      "frauds": 10
+    },
+    {
+      "step": 543,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 544,
+      "rows": 9358,
+      "frauds": 6
+    },
+    {
+      "step": 545,
+      "rows": 3562,
+      "frauds": 0
+    },
+    {
+      "step": 546,
+      "rows": 7771,
+      "frauds": 10
+    },
+    {
+      "step": 547,
+      "rows": 2261,
+      "frauds": 8
+    },
+    {
+      "step": 548,
+      "rows": 5689,
+      "frauds": 2
+    },
+    {
+      "step": 549,
+      "rows": 642,
+      "frauds": 12
+    },
+    {
+      "step": 550,
+      "rows": 4804,
+      "frauds": 8
+    },
+    {
+      "step": 551,
+      "rows": 949,
+      "frauds": 18
+    },
+    {
+      "step": 552,
+      "rows": 1517,
+      "frauds": 10
+    },
+    {
+      "step": 553,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 554,
+      "rows": 18,
+      "frauds": 18
+    },
+    {
+      "step": 555,
+      "rows": 144,
+      "frauds": 6
+    },
+    {
+      "step": 556,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 557,
+      "rows": 20,
+      "frauds": 20
+    },
+    {
+      "step": 558,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 559,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 560,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 561,
+      "rows": 16,
+      "frauds": 16
+    },
+    {
+      "step": 562,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 563,
+      "rows": 3284,
+      "frauds": 18
+    },
+    {
+      "step": 564,
+      "rows": 3546,
+      "frauds": 16
+    },
+    {
+      "step": 565,
+      "rows": 5425,
+      "frauds": 12
+    },
+    {
+      "step": 566,
+      "rows": 1421,
+      "frauds": 6
+    },
+    {
+      "step": 567,
+      "rows": 4356,
+      "frauds": 10
+    },
+    {
+      "step": 568,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 569,
+      "rows": 1182,
+      "frauds": 14
+    },
+    {
+      "step": 570,
+      "rows": 1965,
+      "frauds": 10
+    },
+    {
+      "step": 571,
+      "rows": 4256,
+      "frauds": 10
+    },
+    {
+      "step": 572,
+      "rows": 18,
+      "frauds": 18
+    },
+    {
+      "step": 573,
+      "rows": 3487,
+      "frauds": 8
+    },
+    {
+      "step": 574,
+      "rows": 2614,
+      "frauds": 4
+    },
+    {
+      "step": 575,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 576,
+      "rows": 877,
+      "frauds": 14
+    },
+    {
+      "step": 577,
+      "rows": 364,
+      "frauds": 12
+    },
+    {
+      "step": 578,
+      "rows": 269,
+      "frauds": 20
+    },
+    {
+      "step": 579,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 580,
+      "rows": 58,
+      "frauds": 10
+    },
+    {
+      "step": 581,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 582,
+      "rows": 775,
+      "frauds": 16
+    },
+    {
+      "step": 583,
+      "rows": 16,
+      "frauds": 16
+    },
+    {
+      "step": 584,
+      "rows": 281,
+      "frauds": 8
+    },
+    {
+      "step": 585,
+      "rows": 2047,
+      "frauds": 6
+    },
+    {
+      "step": 586,
+      "rows": 1581,
+      "frauds": 12
+    },
+    {
+      "step": 587,
+      "rows": 2740,
+      "frauds": 6
+    },
+    {
+      "step": 588,
+      "rows": 4894,
+      "frauds": 12
+    },
+    {
+      "step": 589,
+      "rows": 6245,
+      "frauds": 2
+    },
+    {
+      "step": 590,
+      "rows": 6584,
+      "frauds": 8
+    },
+    {
+      "step": 591,
+      "rows": 57,
+      "frauds": 12
+    },
+    {
+      "step": 592,
+      "rows": 5373,
+      "frauds": 10
+    },
+    {
+      "step": 593,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 594,
+      "rows": 6536,
+      "frauds": 10
+    },
+    {
+      "step": 595,
+      "rows": 5434,
+      "frauds": 12
+    },
+    {
+      "step": 596,
+      "rows": 9319,
+      "frauds": 8
+    },
+    {
+      "step": 597,
+      "rows": 2486,
+      "frauds": 6
+    },
+    {
+      "step": 598,
+      "rows": 934,
+      "frauds": 4
+    },
+    {
+      "step": 599,
+      "rows": 1816,
+      "frauds": 6
+    },
+    {
+      "step": 600,
+      "rows": 18,
+      "frauds": 18
+    },
+    {
+      "step": 601,
+      "rows": 865,
+      "frauds": 10
+    },
+    {
+      "step": 602,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 603,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 604,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 605,
+      "rows": 16,
+      "frauds": 16
+    },
+    {
+      "step": 606,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 607,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 608,
+      "rows": 1082,
+      "frauds": 16
+    },
+    {
+      "step": 609,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 610,
+      "rows": 1199,
+      "frauds": 12
+    },
+    {
+      "step": 611,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 612,
+      "rows": 2677,
+      "frauds": 12
+    },
+    {
+      "step": 613,
+      "rows": 45,
+      "frauds": 20
+    },
+    {
+      "step": 614,
+      "rows": 1278,
+      "frauds": 16
+    },
+    {
+      "step": 615,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 616,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 617,
+      "rows": 2680,
+      "frauds": 16
+    },
+    {
+      "step": 618,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 619,
+      "rows": 2800,
+      "frauds": 14
+    },
+    {
+      "step": 620,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 621,
+      "rows": 1121,
+      "frauds": 18
+    },
+    {
+      "step": 622,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 623,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 624,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 625,
+      "rows": 24,
+      "frauds": 24
+    },
+    {
+      "step": 626,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 627,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 628,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 629,
+      "rows": 20,
+      "frauds": 20
+    },
+    {
+      "step": 630,
+      "rows": 150,
+      "frauds": 4
+    },
+    {
+      "step": 631,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 632,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 633,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 634,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 635,
+      "rows": 16,
+      "frauds": 16
+    },
+    {
+      "step": 636,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 637,
+      "rows": 3390,
+      "frauds": 12
+    },
+    {
+      "step": 638,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 639,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 640,
+      "rows": 1398,
+      "frauds": 14
+    },
+    {
+      "step": 641,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 642,
+      "rows": 1141,
+      "frauds": 8
+    },
+    {
+      "step": 643,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 644,
+      "rows": 2267,
+      "frauds": 10
+    },
+    {
+      "step": 645,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 646,
+      "rows": 20,
+      "frauds": 20
+    },
+    {
+      "step": 647,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 648,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 649,
+      "rows": 263,
+      "frauds": 10
+    },
+    {
+      "step": 650,
+      "rows": 16,
+      "frauds": 16
+    },
+    {
+      "step": 651,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 652,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 653,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 654,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 655,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 656,
+      "rows": 1965,
+      "frauds": 16
+    },
+    {
+      "step": 657,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 658,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 659,
+      "rows": 2500,
+      "frauds": 10
+    },
+    {
+      "step": 660,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 661,
+      "rows": 4877,
+      "frauds": 8
+    },
+    {
+      "step": 662,
+      "rows": 2,
+      "frauds": 2
+    },
+    {
+      "step": 663,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 664,
+      "rows": 1125,
+      "frauds": 20
+    },
+    {
+      "step": 665,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 666,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 667,
+      "rows": 1400,
+      "frauds": 6
+    },
+    {
+      "step": 668,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 669,
+      "rows": 322,
+      "frauds": 8
+    },
+    {
+      "step": 670,
+      "rows": 1906,
+      "frauds": 12
+    },
+    {
+      "step": 671,
+      "rows": 18,
+      "frauds": 18
+    },
+    {
+      "step": 672,
+      "rows": 153,
+      "frauds": 8
+    },
+    {
+      "step": 673,
+      "rows": 445,
+      "frauds": 12
+    },
+    {
+      "step": 674,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 675,
+      "rows": 30,
+      "frauds": 10
+    },
+    {
+      "step": 676,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 677,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 678,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 679,
+      "rows": 72,
+      "frauds": 6
+    },
+    {
+      "step": 680,
+      "rows": 22,
+      "frauds": 22
+    },
+    {
+      "step": 681,
+      "rows": 4703,
+      "frauds": 4
+    },
+    {
+      "step": 682,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 683,
+      "rows": 2192,
+      "frauds": 8
+    },
+    {
+      "step": 684,
+      "rows": 4562,
+      "frauds": 8
+    },
+    {
+      "step": 685,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 686,
+      "rows": 4689,
+      "frauds": 16
+    },
+    {
+      "step": 687,
+      "rows": 8040,
+      "frauds": 8
+    },
+    {
+      "step": 688,
+      "rows": 7885,
+      "frauds": 8
+    },
+    {
+      "step": 689,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 690,
+      "rows": 4972,
+      "frauds": 12
+    },
+    {
+      "step": 691,
+      "rows": 4809,
+      "frauds": 12
+    },
+    {
+      "step": 692,
+      "rows": 6898,
+      "frauds": 20
+    },
+    {
+      "step": 693,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 694,
+      "rows": 2664,
+      "frauds": 24
+    },
+    {
+      "step": 695,
+      "rows": 2827,
+      "frauds": 10
+    },
+    {
+      "step": 696,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 697,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 698,
+      "rows": 65,
+      "frauds": 16
+    },
+    {
+      "step": 699,
+      "rows": 55,
+      "frauds": 16
+    },
+    {
+      "step": 700,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 701,
+      "rows": 18,
+      "frauds": 18
+    },
+    {
+      "step": 702,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 703,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 704,
+      "rows": 16,
+      "frauds": 16
+    },
+    {
+      "step": 705,
+      "rows": 2362,
+      "frauds": 10
+    },
+    {
+      "step": 706,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 707,
+      "rows": 309,
+      "frauds": 10
+    },
+    {
+      "step": 708,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 709,
+      "rows": 2313,
+      "frauds": 8
+    },
+    {
+      "step": 710,
+      "rows": 1788,
+      "frauds": 14
+    },
+    {
+      "step": 711,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 712,
+      "rows": 23,
+      "frauds": 12
+    },
+    {
+      "step": 713,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 714,
+      "rows": 681,
+      "frauds": 14
+    },
+    {
+      "step": 715,
+      "rows": 1879,
+      "frauds": 10
+    },
+    {
+      "step": 716,
+      "rows": 140,
+      "frauds": 8
+    },
+    {
+      "step": 717,
+      "rows": 632,
+      "frauds": 12
+    },
+    {
+      "step": 718,
+      "rows": 918,
+      "frauds": 16
+    },
+    {
+      "step": 719,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 720,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 721,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 722,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 723,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 724,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 725,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 726,
+      "rows": 22,
+      "frauds": 22
+    },
+    {
+      "step": 727,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 728,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 729,
+      "rows": 4,
+      "frauds": 4
+    },
+    {
+      "step": 730,
+      "rows": 28,
+      "frauds": 28
+    },
+    {
+      "step": 731,
+      "rows": 16,
+      "frauds": 16
+    },
+    {
+      "step": 732,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 733,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 734,
+      "rows": 8,
+      "frauds": 8
+    },
+    {
+      "step": 735,
+      "rows": 12,
+      "frauds": 12
+    },
+    {
+      "step": 736,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 737,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 738,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 739,
+      "rows": 10,
+      "frauds": 10
+    },
+    {
+      "step": 740,
+      "rows": 6,
+      "frauds": 6
+    },
+    {
+      "step": 741,
+      "rows": 22,
+      "frauds": 22
+    },
+    {
+      "step": 742,
+      "rows": 14,
+      "frauds": 14
+    },
+    {
+      "step": 743,
+      "rows": 8,
+      "frauds": 8
+    }
+  ],
+  "is_flagged_fraud": {
+    "flagged": 16,
+    "flagged_and_fraud": 16,
+    "frauds_flagged_share": 0.0019481310118105442
+  },
+  "leakage_checks": {
+    "fraud_with_balance_error_share": 0.005479118470717156,
+    "legit_with_balance_error_share": 0.7996244181400405,
+    "fraud_emptying_origin_share": 0.9805186898818946,
+    "legit_emptying_origin_share": 0.566774051457516
+  },
+  "account_ids": {
+    "unique_orig": 6353307,
+    "unique_dest": 2722362,
+    "dest_merchants_share": 0.3381460781879163
+  }
+}

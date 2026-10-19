@@ -1,5 +1,10 @@
+# fastapi
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
+# dependencias
+from app.auth.auth_dependency import require_permission
+
+# esquemas
 from app.model.model_schema import (
     ExperimentOut,
     ExperimentsOut,
@@ -7,18 +12,26 @@ from app.model.model_schema import (
     MetricsOut,
     ModelInfoOut,
 )
-from config.settings import settings
-from utils.auth import get_current_user
+
+# casos de uso
+from app.model.usecases.use_model_experiment_list import (
+    execute as list_experiment_execute,
+)
+from app.model.usecases.use_model_experiment_view import (
+    execute as view_experiment_execute,
+)
+from app.model.usecases.use_model_health import execute as health_model_execute
+from app.model.usecases.use_model_info import execute as info_model_execute
+from app.model.usecases.use_model_metrics import execute as metrics_model_execute
 
 router = APIRouter(tags=["model"])
 
 
 @router.get("/health", response_model=HealthOut)
-def health(request: Request) -> HealthOut:
-    return HealthOut(
-        status="ok",
-        model_loaded=request.app.state.model is not None,
-        metrics_loaded=request.app.state.metrics is not None,
+def health_endpoint(request: Request):
+    """Revisa si la API y el modelo están funcionando"""
+    return health_model_execute(
+        model=request.app.state.model, metrics=request.app.state.metrics
     )
 
 
@@ -26,84 +39,53 @@ def health(request: Request) -> HealthOut:
     "/metrics",
     response_model=MetricsOut,
     response_model_exclude_none=True,
-    dependencies=[Depends(get_current_user)],
+    dependencies=[Depends(require_permission("modelo", "ver"))],
 )
-def metrics(request: Request) -> MetricsOut:
-    metrics = request.app.state.metrics
-    if metrics is None:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Las métricas no están disponibles",
-        )
-    return metrics
+def metrics_model_endpoint(request: Request):
+    """Métricas del modelo desplegado"""
+    return metrics_model_execute(metrics=request.app.state.metrics)
 
 
 @router.get(
-    "/model/info", response_model=ModelInfoOut, dependencies=[Depends(get_current_user)]
+    "/model/info",
+    response_model=ModelInfoOut,
+    dependencies=[Depends(require_permission("modelo", "ver"))],
 )
-def model_info(request: Request) -> ModelInfoOut:
-    """Versión, variables y política de decisión del modelo cargado."""
-    info = request.app.state.metrics.model_dump() if request.app.state.metrics else {}
-    policy = request.app.state.policy
-    return ModelInfoOut(
-        loaded=request.app.state.model is not None,
-        version=info.get("version"),
-        model_name=info.get("model_name"),
-        model_type=info.get("model_type"),
-        feature_set=info.get("feature_set"),
-        feature_set_label=info.get("feature_set_label"),
-        features=info.get("features") or [],
-        trained_at=info.get("trained_at"),
-        split=info.get("split"),
-        threshold=policy.high,
-        risk_levels={
-            "medium": policy.medium,
-            "high": policy.high,
-            "source": policy.source,
-        },
-        threshold_criterion=info.get("threshold_criterion"),
-        sha256=info.get("sha256"),
-        limits={
-            "max_batch_rows": settings.max_batch_rows,
-            "max_upload_mb": settings.max_upload_mb,
-            "rate_limit_per_minute": settings.rate_limit_per_minute,
-        },
+def info_model_endpoint(request: Request):
+    """Versión, variables y umbrales del modelo que está cargado"""
+    return info_model_execute(
+        model=request.app.state.model,
+        metrics=request.app.state.metrics,
+        policy=request.app.state.policy,
     )
-
-
-def get_experiments(request: Request) -> ExperimentsOut:
-    data = request.app.state.experiments
-    if data is None:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Los experimentos no están disponibles",
-        )
-    metrics = request.app.state.metrics
-    deployed = getattr(metrics, "version", None) if metrics is not None else None
-    return ExperimentsOut.model_validate({**data, "deployed": deployed})
 
 
 @router.get(
     "/experiments",
     response_model=ExperimentsOut,
-    dependencies=[Depends(get_current_user)],
+    dependencies=[Depends(require_permission("modelo", "ver"))],
 )
-def experiments(request: Request) -> ExperimentsOut:
-    """Comparación de modelos y conjuntos de variables con la misma partición temporal."""
-    return get_experiments(request)
+def list_experiment_endpoint(request: Request):
+    """Lista de los modelos que se probaron, para compararlos"""
+    return list_experiment_execute(
+        experiments=request.app.state.experiments, metrics=request.app.state.metrics
+    )
 
 
 @router.get(
     "/experiments/{version}",
     response_model=ExperimentOut,
-    dependencies=[Depends(get_current_user)],
+    dependencies=[Depends(require_permission("modelo", "ver"))],
 )
-def experiment(version: str, request: Request) -> ExperimentOut:
-    found = next(
-        (e for e in get_experiments(request).experiments if e.version == version), None
+def view_experiment_endpoint(version: str, request: Request):
+    """Ver un experimento por su versión"""
+    experiment = view_experiment_execute(
+        experiments=request.app.state.experiments,
+        metrics=request.app.state.metrics,
+        version=version,
     )
-    if found is None:
+    if experiment is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="El experimento no existe"
         )
-    return found
+    return experiment

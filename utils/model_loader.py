@@ -19,6 +19,7 @@ def load_model(
     path: Path,
     expected_sha256: str | None = None,
     available_columns: Iterable[str] | None = None,
+    threads: int | None = None,
 ) -> Any | None:
     if not path.exists():
         logger.warning("No se encontró el modelo en %s", path)
@@ -45,8 +46,23 @@ def load_model(
             )
             return None
 
+    if threads is not None:
+        limit_threads(model, threads)
     logger.debug("Modelo cargado desde %s", path)
     return model
+
+
+def limit_threads(model: Any, threads: int) -> None:
+    """Limita los núcleos que usa el modelo"""
+    if not hasattr(model, "get_params"):
+        return
+    params = {
+        name: threads
+        for name in model.get_params()
+        if name == "n_jobs" or name.endswith("__n_jobs")
+    }
+    if params:
+        model.set_params(**params)
 
 
 def load_metrics[T: BaseModel](path: Path, schema: type[T]) -> T | None:

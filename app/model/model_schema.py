@@ -12,7 +12,7 @@ class HealthOut(BaseModel):
 
 
 class MetricsOut(BaseModel):
-    """Métricas del entrenamiento; las claves extra de metrics.json se devuelven tal cual."""
+    """Métricas del entrenamiento. Si metrics.json trae más datos, se devuelven igual"""
 
     model_config = ConfigDict(extra="allow")
 
@@ -49,7 +49,7 @@ class ModelInfoOut(BaseModel):
 
 
 class ExperimentOut(BaseModel):
-    """Fila de experiments.json; las claves extra se devuelven tal cual."""
+    """Un experimento de experiments.json. Si trae más datos, se devuelven igual"""
 
     model_config = ConfigDict(extra="allow", protected_namespaces=())
 
