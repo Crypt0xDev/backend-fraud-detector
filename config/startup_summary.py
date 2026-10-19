@@ -3,9 +3,8 @@ import sys
 from typing import Any
 from urllib.parse import urlsplit
 
-from app.prediction.prediction_policy import build_policy
-from config.routes import API_PREFIX
-from config.settings import Settings
+from config import database
+from config.settings import API_PREFIX, Settings
 from utils.storage import LocalStorage, SupabaseStorage
 
 logger = logging.getLogger(__name__)
@@ -13,8 +12,8 @@ logger = logging.getLogger(__name__)
 WIDTH = 60
 
 
-def describe_database(database_url: str | None, users: Any) -> str:
-    if not database_url or users is None:
+def describe_database(database_url: str | None, engine: Any) -> str:
+    if not database_url or engine is None:
         return "no configurada (login e historial no disponibles)"
     url = urlsplit(database_url)
     name = url.path.lstrip("/") or "postgres"
@@ -51,15 +50,11 @@ def describe_model(model: Any, metrics: Any, policy: Any) -> list[str]:
 def build_summary(state: Any, settings: Settings) -> str:
     api = f"{settings.api_public_url.rstrip('/')}{API_PREFIX}"
     rows = [
-        ("Base de datos", describe_database(settings.database_url, state.users)),
+        ("Base de datos", describe_database(settings.database_url, database.engine)),
         ("Archivos", describe_storage(state.storage)),
         *(
             ("Modelo", line)
-            for line in describe_model(
-                state.model,
-                state.metrics,
-                build_policy(state.metrics, settings.fraud_threshold),
-            )
+            for line in describe_model(state.model, state.metrics, state.policy)
         ),
         ("API", api),
         ("Docs", f"{settings.api_public_url.rstrip('/')}/docs"),

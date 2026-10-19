@@ -1,19 +1,22 @@
 import logging
 
-from app.user.user_repository import UserRepository
-from seeders.admin_seeder import seed_admin
-from seeders.user_seeder import seed_user
+from sqlalchemy.orm import Session
+
+from config.seeders.seed_catalog import seed_catalog
+from config.seeders.seed_legacy_roles import seed_legacy_roles
+from config.seeders.seed_roles import seed_roles
+from config.seeders.seed_users import seed_admin, seed_user
 
 logger = logging.getLogger(__name__)
 
-SEEDERS = [seed_admin, seed_user]
+# El orden importa: primero el catálogo, luego los roles y al final los usuarios
+SEEDERS = [seed_catalog, seed_roles, seed_legacy_roles, seed_admin, seed_user]
 
 
-def create_default_records(users: UserRepository | None) -> None:
-    if users is None:
-        return
+def run_all_seeders(db: Session) -> None:
     for seeder in SEEDERS:
         try:
-            seeder(users)
+            seeder(db)
         except Exception:
+            db.rollback()
             logger.exception("Falló el seeder %s", seeder.__name__)
