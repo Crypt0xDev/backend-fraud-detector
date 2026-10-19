@@ -1,7 +1,9 @@
+from datetime import datetime
+from typing import TYPE_CHECKING
+
 from sqlalchemy import (
     Boolean,
     CheckConstraint,
-    Column,
     DateTime,
     ForeignKey,
     Integer,
@@ -9,11 +11,16 @@ from sqlalchemy import (
     UniqueConstraint,
     func,
 )
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.user.user_schema import ACTIVE
 from config.database import BaseModel
 from utils.helpers import utcnow
+
+if TYPE_CHECKING:
+    from app.batch.batch_entity import Batch
+    from app.prediction.prediction_entity import PredictionRecord
+    from app.role.role_entity import Role
 
 
 class User(BaseModel):
@@ -44,34 +51,27 @@ class User(BaseModel):
         },
     )
 
-    username = Column(Text, primary_key=True)
-    password_hash = Column(Text, nullable=False)
+    username: Mapped[str] = mapped_column(Text, primary_key=True)
+    password_hash: Mapped[str] = mapped_column(Text)
     # Acceso total al sistema
-    root = Column(Boolean, nullable=False, default=False, server_default="false")
+    root: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
 
-    state = Column(Text, nullable=False, server_default=ACTIVE)
+    state: Mapped[str] = mapped_column(Text, server_default=ACTIVE)
     # Sube al cambiar la contraseña; los tokens con otro número ya no sirven
-    token_version = Column(Integer, nullable=False, default=0, server_default="0")
-    created_at = Column(
-        DateTime(timezone=True),
-        nullable=False,
-        default=utcnow,
-        server_default=func.now(),
+    token_version: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, server_default=func.now()
     )
-    updated_at = Column(DateTime(timezone=True), default=None)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
-    roles = relationship("Role", secondary="user_role", order_by="Role.name")
-    batches = relationship(
-        "Batch",
-        back_populates="user",
-        cascade="all, delete-orphan",
-        passive_deletes=True,
+    roles: Mapped[list["Role"]] = relationship(
+        secondary="user_role", order_by="Role.name"
     )
-    predictions = relationship(
-        "PredictionRecord",
-        back_populates="user",
-        cascade="all, delete-orphan",
-        passive_deletes=True,
+    batches: Mapped[list["Batch"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan", passive_deletes=True
+    )
+    predictions: Mapped[list["PredictionRecord"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan", passive_deletes=True
     )
 
 
@@ -84,14 +84,13 @@ class UserRole(BaseModel):
         {"info": {"upgrades": ["ALTER TABLE user_role ENABLE ROW LEVEL SECURITY"]}},
     )
 
-    id = Column(Integer, primary_key=True)
-    username = Column(
-        Text, ForeignKey("users.username", ondelete="CASCADE"), nullable=False
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    username: Mapped[str] = mapped_column(
+        Text, ForeignKey("users.username", ondelete="CASCADE")
     )
-    role_id = Column(Integer, ForeignKey("role.id", ondelete="CASCADE"), nullable=False)
-    created_at = Column(
-        DateTime(timezone=True),
-        nullable=False,
-        default=utcnow,
-        server_default=func.now(),
+    role_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("role.id", ondelete="CASCADE")
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, server_default=func.now()
     )

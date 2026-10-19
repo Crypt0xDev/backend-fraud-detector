@@ -1,18 +1,15 @@
-from sqlalchemy import (
-    Boolean,
-    Column,
-    DateTime,
-    Double,
-    ForeignKey,
-    Index,
-    Text,
-    Uuid,
-    func,
-)
-from sqlalchemy.orm import relationship
+import uuid
+from datetime import datetime
+from typing import TYPE_CHECKING
+
+from sqlalchemy import Boolean, DateTime, Double, ForeignKey, Index, Text, Uuid, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from config.database import BaseModel
 from utils.helpers import utcnow
+
+if TYPE_CHECKING:
+    from app.user.user_entity import User
 
 
 class PredictionRecord(BaseModel):
@@ -23,32 +20,29 @@ class PredictionRecord(BaseModel):
         {"info": {"upgrades": ["ALTER TABLE predictions ENABLE ROW LEVEL SECURITY"]}},
     )
 
-    id = Column(Uuid, primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True)
     # Se usa el nombre de la tabla para no importar nada del módulo user
-    username = Column(
-        Text, ForeignKey("users.username", ondelete="CASCADE"), nullable=False
+    username: Mapped[str] = mapped_column(
+        Text, ForeignKey("users.username", ondelete="CASCADE")
     )
 
     # Datos de la transacción
-    type = Column(Text, nullable=False)
-    amount = Column(Double, nullable=False)
-    name_orig = Column(Text, nullable=True)
-    name_dest = Column(Text, nullable=True)
+    type: Mapped[str] = mapped_column(Text)
+    amount: Mapped[float] = mapped_column(Double)
+    name_orig: Mapped[str | None] = mapped_column(Text)
+    name_dest: Mapped[str | None] = mapped_column(Text)
 
     # Resultado del modelo
-    fraud_probability = Column(Double, nullable=False)
-    is_fraud = Column(Boolean, nullable=False)
-    threshold = Column(Double, nullable=False)
+    fraud_probability: Mapped[float] = mapped_column(Double)
+    is_fraud: Mapped[bool] = mapped_column(Boolean)
+    threshold: Mapped[float] = mapped_column(Double)
 
-    created_at = Column(
-        DateTime(timezone=True),
-        nullable=False,
-        default=utcnow,
-        server_default=func.now(),
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, server_default=func.now()
     )
 
     # Relaciones
-    user = relationship("User", back_populates="predictions")
+    user: Mapped["User"] = relationship(back_populates="predictions")
 
 
 Index(

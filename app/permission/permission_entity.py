@@ -1,8 +1,14 @@
-from sqlalchemy import Column, DateTime, Integer, Text, func
-from sqlalchemy.orm import relationship
+from datetime import datetime
+from typing import TYPE_CHECKING
+
+from sqlalchemy import DateTime, Integer, Text, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from config.database import BaseModel
 from utils.helpers import utcnow
+
+if TYPE_CHECKING:
+    from app.module.module_entity import ModulePermission
 
 
 class Permission(BaseModel):
@@ -13,14 +19,13 @@ class Permission(BaseModel):
         {"info": {"upgrades": ["ALTER TABLE permission ENABLE ROW LEVEL SECURITY"]}},
     )
 
-    id = Column(Integer, primary_key=True)
-    name = Column(Text, nullable=False, unique=True)
-    created_at = Column(
-        DateTime(timezone=True),
-        nullable=False,
-        default=utcnow,
-        server_default=func.now(),
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(Text, unique=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, server_default=func.now()
     )
 
     # Relaciones
-    permission_modules = relationship("ModulePermission", back_populates="permission")
+    permission_modules: Mapped[list["ModulePermission"]] = relationship(
+        back_populates="permission"
+    )

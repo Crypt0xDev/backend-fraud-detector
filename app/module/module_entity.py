@@ -1,6 +1,8 @@
+from datetime import datetime
+from typing import TYPE_CHECKING, Optional
+
 from sqlalchemy import (
     Boolean,
-    Column,
     DateTime,
     ForeignKey,
     Integer,
@@ -8,10 +10,13 @@ from sqlalchemy import (
     UniqueConstraint,
     func,
 )
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from config.database import BaseModel
 from utils.helpers import utcnow
+
+if TYPE_CHECKING:
+    from app.permission.permission_entity import Permission
 
 
 class Module(BaseModel):
@@ -22,31 +27,26 @@ class Module(BaseModel):
         {"info": {"upgrades": ["ALTER TABLE module ENABLE ROW LEVEL SECURITY"]}},
     )
 
-    id = Column(Integer, primary_key=True)
-    code = Column(Text, nullable=False, unique=True)
-    name = Column(Text, nullable=False)
-    icon = Column(Text, nullable=True)
-    is_parent = Column(Boolean, nullable=False, default=False)
-    path = Column(Text, nullable=True)
-    parent_id = Column(Integer, ForeignKey("module.id"), nullable=True)
-    created_at = Column(
-        DateTime(timezone=True),
-        nullable=False,
-        default=utcnow,
-        server_default=func.now(),
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    code: Mapped[str] = mapped_column(Text, unique=True)
+    name: Mapped[str] = mapped_column(Text)
+    icon: Mapped[str | None] = mapped_column(Text)
+    is_parent: Mapped[bool] = mapped_column(Boolean, default=False)
+    path: Mapped[str | None] = mapped_column(Text)
+    parent_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("module.id"))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, server_default=func.now()
     )
 
-    # Relaciones
-    children = relationship(
-        "Module",
-        backref="parent",
-        remote_side=[id],
-        cascade="all, delete-orphan",
-        passive_deletes=True,
-        single_parent=True,
+    # Relaciones; al borrar un módulo se borran sus hijos
+    parent: Mapped[Optional["Module"]] = relationship(
+        back_populates="children", remote_side=[id]
     )
-    module_permissions = relationship(
-        "ModulePermission", back_populates="module", cascade="all, delete-orphan"
+    children: Mapped[list["Module"]] = relationship(
+        back_populates="parent", cascade="all, delete-orphan"
+    )
+    module_permissions: Mapped[list["ModulePermission"]] = relationship(
+        back_populates="module", cascade="all, delete-orphan"
     )
 
 
@@ -63,20 +63,17 @@ class ModulePermission(BaseModel):
         },
     )
 
-    id = Column(Integer, primary_key=True)
-    module_id = Column(
-        Integer, ForeignKey("module.id", ondelete="CASCADE"), nullable=False
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    module_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("module.id", ondelete="CASCADE")
     )
-    permission_id = Column(
-        Integer, ForeignKey("permission.id", ondelete="CASCADE"), nullable=False
+    permission_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("permission.id", ondelete="CASCADE")
     )
-    created_at = Column(
-        DateTime(timezone=True),
-        nullable=False,
-        default=utcnow,
-        server_default=func.now(),
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, server_default=func.now()
     )
 
     # Relaciones
-    module = relationship("Module", back_populates="module_permissions")
-    permission = relationship("Permission", back_populates="permission_modules")
+    module: Mapped[Module] = relationship(back_populates="module_permissions")
+    permission: Mapped["Permission"] = relationship(back_populates="permission_modules")

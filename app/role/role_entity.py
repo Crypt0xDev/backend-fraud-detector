@@ -1,16 +1,14 @@
-from sqlalchemy import (
-    Column,
-    DateTime,
-    ForeignKey,
-    Integer,
-    Text,
-    UniqueConstraint,
-    func,
-)
-from sqlalchemy.orm import relationship
+from datetime import datetime
+from typing import TYPE_CHECKING
+
+from sqlalchemy import DateTime, ForeignKey, Integer, Text, UniqueConstraint, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from config.database import BaseModel
 from utils.helpers import utcnow
+
+if TYPE_CHECKING:
+    from app.module.module_entity import ModulePermission
 
 
 class Role(BaseModel):
@@ -21,20 +19,17 @@ class Role(BaseModel):
         {"info": {"upgrades": ["ALTER TABLE role ENABLE ROW LEVEL SECURITY"]}},
     )
 
-    id = Column(Integer, primary_key=True)
-    name = Column(Text, nullable=False, unique=True)
-    description = Column(Text, nullable=False)
-    created_at = Column(
-        DateTime(timezone=True),
-        nullable=False,
-        default=utcnow,
-        server_default=func.now(),
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(Text, unique=True)
+    description: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, server_default=func.now()
     )
-    updated_at = Column(DateTime(timezone=True), default=None)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     # Relaciones
-    role_permissions = relationship(
-        "RolePermission", back_populates="role", cascade="all, delete-orphan"
+    role_permissions: Mapped[list["RolePermission"]] = relationship(
+        back_populates="role", cascade="all, delete-orphan"
     )
 
 
@@ -53,18 +48,17 @@ class RolePermission(BaseModel):
         },
     )
 
-    id = Column(Integer, primary_key=True)
-    role_id = Column(Integer, ForeignKey("role.id", ondelete="CASCADE"), nullable=False)
-    module_permission_id = Column(
-        Integer, ForeignKey("module_permission.id", ondelete="CASCADE"), nullable=False
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    role_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("role.id", ondelete="CASCADE")
     )
-    created_at = Column(
-        DateTime(timezone=True),
-        nullable=False,
-        default=utcnow,
-        server_default=func.now(),
+    module_permission_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("module_permission.id", ondelete="CASCADE")
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, server_default=func.now()
     )
 
     # Relaciones
-    role = relationship("Role", back_populates="role_permissions")
-    module_permission = relationship("ModulePermission")
+    role: Mapped[Role] = relationship(back_populates="role_permissions")
+    module_permission: Mapped["ModulePermission"] = relationship()
