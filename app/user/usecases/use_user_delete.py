@@ -1,33 +1,43 @@
-from app.batch.batch_repository import BatchRepository
-from app.batch.batch_storage import object_paths
-from app.user.usecases.use_user_update import (
-    ProtectedUserError,
-    ensure_exists,
-    ensure_not_last_admin,
-)
-from app.user.user_repository import UserRepository
-from utils.storage import FileStorage
+from collections.abc import Sequence
+
+from fastapi import HTTPException, status
+from sqlalchemy.orm import Session
+
+from app.user.usecases.use_user_roles import ensure_not_last_root
+from app.user.user_entity import User
+from app.user.user_port import UserDataCleaner
+from utils.storage import StorageError
 
 
-def delete_user(
-    users: UserRepository,
-    batches: BatchRepository | None,
-    storage: FileStorage | None,
+def execute(
+    db: Session,
+    current_user: User,
     username: str,
-    *,
-    acting_admin: str,
-) -> None:
-    """Borra el usuario, sus lotes (en cascada en la base) y los archivos de esos lotes."""
-    ensure_exists(users, username)
-    if username == acting_admin:
-        raise ProtectedUserError("No puedes borrar tu propio usuario")
-    ensure_not_last_admin(users, username)
-    if batches is not None and storage is not None:
-        paths = [
-            path
-            for batch_id in batches.ids(username)
-            for path in object_paths(batch_id)
-        ]
-        if paths:
-            storage.delete(paths)
-    users.delete(username)
+    cleaners: Sequence[UserDataCleaner],
+) -> bool:
+    """Borra el usuario"""
+    db_user = db.query(User).filter(User.username == username).first()
+    if db_user is None:
+        return False
+
+    # Verificar que no se borre a sí mismo ni al último root
+    if username == current_user.username:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="No puedes borrar tu propio usuario",
+        )
+    ensure_not_last_root(db, db_user)
+
+    # Borrar los archivos del usuario antes que la cuenta
+    try:
+        for cleaner in cleaners:
+            cleaner.delete_user_data(db, username)
+    except StorageError as error:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="No se pudieron borrar los archivos del usuario",
+        ) from error
+
+    db.delete(db_user)
+    db.commit()
+    return True

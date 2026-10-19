@@ -1,105 +1,182 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
-
-from app.user.usecases.use_user_create import (
-    InvalidUserError,
-    UserExistsError,
-    register_user,
+# fastapi
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    Query,
+    Request,
+    Response,
+    status,
 )
-from app.user.usecases.use_user_delete import delete_user
-from app.user.usecases.use_user_list import list_users
-from app.user.usecases.use_user_update import (
-    ProtectedUserError,
-    UserNotFoundError,
-    update_user,
+from sqlalchemy.orm import Session
+
+# dependencias
+from app.auth.auth_dependency import get_current_root, get_current_user
+
+# casos de uso
+from app.user.usecases.use_user_change_password import (
+    execute as change_password_user_execute,
 )
-from app.user.user_schema import UserAccountOut, UserCreateIn, UserUpdateIn
-from utils.auth import CurrentAdmin, Users, get_current_admin
-from utils.storage import StorageError
+from app.user.usecases.use_user_create import execute as create_user_execute
+from app.user.usecases.use_user_delete import execute as delete_user_execute
+from app.user.usecases.use_user_disable import execute as disable_user_execute
+from app.user.usecases.use_user_enable import execute as enable_user_execute
+from app.user.usecases.use_user_list import execute as list_user_execute
+from app.user.usecases.use_user_update import execute as update_user_execute
+from app.user.usecases.use_user_view import execute as view_user_execute
 
-router = APIRouter(
-    prefix="/users", tags=["users"], dependencies=[Depends(get_current_admin)]
+# entidades
+from app.user.user_entity import User
+
+# esquemas
+from app.user.user_schema import (
+    SchemaChangePassword,
+    SchemaCreate,
+    SchemaResponse,
+    SchemaUpdate,
 )
+from config.database import get_db
+
+router = APIRouter(prefix="/users", tags=["users"])
 
 
-def not_found() -> HTTPException:
-    return HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND, detail="El usuario no existe"
-    )
+@router.post("", response_model=SchemaResponse, status_code=status.HTTP_201_CREATED)
+def create_user_endpoint(
+    user: SchemaCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_root),
+):
+    """Crear un usuario. Solo el root"""
+    return create_user_execute(db=db, current_user=current_user, user=user)
 
 
-def bad_request(error: Exception) -> HTTPException:
-    return HTTPException(
-        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(error)
-    )
+@router.get("", response_model=list[SchemaResponse])
+def list_user_endpoint(
+    skip: int = Query(default=0, ge=0),
+    limit: int = Query(default=50, ge=1, le=100),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_root),
+):
+    """Listar todos los usuarios"""
+    return list_user_execute(db=db, current_user=current_user, skip=skip, limit=limit)
 
 
-def conflict(error: Exception) -> HTTPException:
-    return HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error))
+@router.patch(
+    "/me/change-password",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+)
+def change_password_endpoint(
+    data: SchemaChangePassword,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Cambiar la contraseña del usuario que inició sesión; cierra sus sesiones"""
+    success = change_password_user_execute(db=db, current_user=current_user, data=data)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado"
+        )
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-def find(users: Users, username: str) -> UserAccountOut:
-    user = next((u for u in list_users(users) if u.username == username), None)
+@router.get("/{username}", response_model=SchemaResponse)
+def view_user_endpoint(
+    username: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_root),
+):
+    """Ver un usuario específico"""
+    user = view_user_execute(db=db, current_user=current_user, username=username)
     if user is None:
-        raise not_found()
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado"
+        )
     return user
 
 
-@router.get("", response_model=list[UserAccountOut])
-def list_route(users: Users) -> list[UserAccountOut]:
-    return list_users(users)
-
-
-@router.post("", response_model=UserAccountOut, status_code=status.HTTP_201_CREATED)
-def create_route(payload: UserCreateIn, users: Users) -> UserAccountOut:
-    try:
-        register_user(users, payload.username, payload.password, payload.role)
-    except UserExistsError as error:
-        raise conflict(ValueError("El usuario ya existe")) from error
-    except InvalidUserError as error:
-        raise bad_request(error) from error
-    return find(users, payload.username.strip())
-
-
-@router.patch("/{username}", response_model=UserAccountOut)
-def update_route(
-    username: str, payload: UserUpdateIn, users: Users, admin: CurrentAdmin
-) -> UserAccountOut:
-    try:
-        update_user(
-            users,
-            username,
-            acting_admin=admin,
-            role=payload.role,
-            password=payload.password,
-        )
-    except UserNotFoundError as error:
-        raise not_found() from error
-    except InvalidUserError as error:
-        raise bad_request(error) from error
-    except ProtectedUserError as error:
-        raise conflict(error) from error
-    return find(users, username)
-
-
-@router.delete("/{username}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_route(
-    username: str, request: Request, users: Users, admin: CurrentAdmin
-) -> Response:
-    try:
-        delete_user(
-            users,
-            request.app.state.batches,
-            request.app.state.storage,
-            username,
-            acting_admin=admin,
-        )
-    except UserNotFoundError as error:
-        raise not_found() from error
-    except ProtectedUserError as error:
-        raise conflict(error) from error
-    except StorageError as error:
+@router.patch("/{username}", response_model=SchemaResponse)
+def update_user_endpoint(
+    username: str,
+    user_data: SchemaUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_root),
+):
+    """Actualizar el rol o la contraseña de un usuario"""
+    user = update_user_execute(
+        db=db, current_user=current_user, username=username, user_data=user_data
+    )
+    if user is None:
         raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="No se pudieron borrar los archivos del usuario",
-        ) from error
+            status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado"
+        )
+    return user
+
+
+@router.delete(
+    "/{username}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+    responses={
+        204: {"description": "Usuario eliminado correctamente"},
+        404: {"description": "Usuario no encontrado"},
+    },
+)
+def delete_user_endpoint(
+    username: str,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_root),
+):
+    """Eliminar un usuario junto con sus lotes, predicciones y archivos"""
+    success = delete_user_execute(
+        db=db,
+        current_user=current_user,
+        username=username,
+        cleaners=request.app.state.user_data_cleaners,
+    )
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado"
+        )
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.patch(
+    "/{username}/enable",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+)
+def enable_user_endpoint(
+    username: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_root),
+):
+    """Habilitar un usuario"""
+    success = enable_user_execute(db=db, current_user=current_user, username=username)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado o ya está habilitado",
+        )
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.patch(
+    "/{username}/disable",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+)
+def disable_user_endpoint(
+    username: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_root),
+):
+    """Deshabilitar un usuario: no podrá iniciar sesión hasta que se habilite"""
+    success = disable_user_execute(db=db, current_user=current_user, username=username)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado o ya está deshabilitado",
+        )
     return Response(status_code=status.HTTP_204_NO_CONTENT)

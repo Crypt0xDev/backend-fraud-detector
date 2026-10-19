@@ -1,44 +1,37 @@
-from app.user.user_repository import UserRepository
-from app.user.user_schema import DEFAULT_ROLE, ROLES, Role
-from utils.password import MIN_PASSWORD_LENGTH, hash_password
+from fastapi import HTTPException, status
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
+
+from app.user.usecases.use_user_roles import default_roles, resolve_roles
+from app.user.user_entity import User
+from app.user.user_schema import ACTIVE, SchemaCreate
+from utils.password import hash_password
 
 
-class InvalidUserError(ValueError):
-    pass
+def execute(db: Session, current_user: User, user: SchemaCreate) -> User:
+    root = user.root or user.role == "admin"
+    db_user = User(
+        username=user.username,
+        password_hash=hash_password(user.password),
+        root=root,
+        state=ACTIVE,
+    )
+    # Si no se eligen roles se le da Analista (el root no necesita)
+    if user.role_ids:
+        db_user.roles = resolve_roles(db, user.role_ids)
+    elif not root:
+        db_user.roles = default_roles(db)
 
-
-def create_user(
-    users: UserRepository, username: str, password: str, role: Role | None = None
-) -> bool:
-    """Crea el usuario o cambia su contraseña; devuelve True si es nuevo.
-
-    Un usuario nuevo recibe `role` (por defecto "user"). En uno existente el rol solo
-    cambia si se indica `role`.
-    """
-    username = username.strip()
-    if not username:
-        raise InvalidUserError("El usuario no puede estar vacío")
-    if len(password) < MIN_PASSWORD_LENGTH:
-        raise InvalidUserError(
-            f"La contraseña debe tener al menos {MIN_PASSWORD_LENGTH} caracteres"
-        )
-    if role is not None and role not in ROLES:
-        raise InvalidUserError(f"Rol no válido: {role}. Usa: {', '.join(ROLES)}")
-    created = users.save(username, hash_password(password), role or DEFAULT_ROLE)
-    if not created and role is not None:
-        users.set_role(username, role)
-    return created
-
-
-class UserExistsError(Exception):
-    pass
-
-
-def register_user(
-    users: UserRepository, username: str, password: str, role: Role
-) -> None:
-    """Alta desde la administración: a diferencia de create_user, no toca un usuario
-    existente."""
-    if users.exists(username.strip()):
-        raise UserExistsError
-    create_user(users, username, password, role)
+    # La clave primaria decide si ya existe; así no falla con dos altas a la vez
+    db.add(db_user)
+    try:
+        db.commit()
+    except IntegrityError as error:
+        db.rollback()
+        if db.get(User, user.username) is None:
+            raise
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="El usuario ya existe"
+        ) from error
+    db.refresh(db_user)
+    return db_user
