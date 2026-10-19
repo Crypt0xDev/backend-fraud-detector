@@ -115,7 +115,7 @@ Cierra y abre la terminal después de instalar.
 git clone https://github.com/Crypt0xDev/backend-fraud-detector.git
 cd backend-fraud-detector
 uv venv --python 3.14 .venv
-uv pip install --python .venv -r requirements.txt
+uv pip install --python .venv -r requirements-dev.txt
 cp .env.example .env
 uv run uvicorn main:app --reload
 ```
@@ -129,7 +129,7 @@ uv run uvicorn main:app --reload
 git clone https://github.com/Crypt0xDev/backend-fraud-detector.git
 cd backend-fraud-detector
 uv venv --python 3.14 .venv
-uv pip install --python .venv -r requirements.txt
+uv pip install --python .venv -r requirements-dev.txt
 copy .env.example .env
 uv run uvicorn main:app --reload
 ```
@@ -138,6 +138,8 @@ uv run uvicorn main:app --reload
 
 > [!NOTE]
 > Copia `.env.example` solo la primera vez; si lo repites sobrescribe tu `.env`.
+>
+> `requirements-dev.txt` instala la API más ruff y pytest. En el servidor solo hace falta `requirements.txt`.
 
 ### 3. Activar y desactivar el entorno virtual (opcional)
 
@@ -189,7 +191,8 @@ uv run python -c "import hashlib; print(hashlib.sha256(open('ml/artifacts/pipeli
 ```text
 backend-fraud-detector/
 ├── main.py                  # Punto de entrada: base, modelo y rutas
-├── requirements.txt         # Dependencias
+├── requirements.txt         # Dependencias de la API
+├── requirements-dev.txt     # Las de la API más ruff y pytest
 ├── app/                     # Un módulo por carpeta (rutas, esquemas, entidades, usecases/)
 │   ├── auth/                # Login, sesión (/auth/me) y control de permisos
 │   ├── user/                # Usuarios (solo el root los gestiona)
@@ -204,11 +207,14 @@ backend-fraud-detector/
 │   ├── settings.py          # Variables de entorno
 │   ├── database.py          # Conexión a PostgreSQL
 │   ├── routes.py            # Registro central de rutas
+│   ├── error_handlers.py    # Convierte los errores de los casos de uso en respuestas HTTP
 │   ├── entities.py          # Importa todas las entidades
 │   ├── create_default_records.py  # Ejecuta los seeders al iniciar
 │   └── seeders/             # Datos iniciales
-├── utils/                   # Tokens, contraseñas, límites, archivos y carga del modelo
-└── ml/artifacts/            # Archivos del modelo entrenado
+├── utils/                   # Tokens, contraseñas, errores, límites, archivos y carga del modelo
+├── ml/artifacts/            # Archivos del modelo entrenado
+├── tests/                   # Pruebas con pytest contra la API real
+└── .vscode/                 # Configuración de VS Code del proyecto y extensiones recomendadas
 ```
 
 ## 🔐 Roles y permisos
@@ -230,6 +236,20 @@ uv run python -m app.user.create_user <usuario> [--role admin|user]
 uv run ruff check .
 uv run ruff format .
 ```
+
+- Correr las pruebas. Por defecto usan SQLite en un archivo temporal, sin tocar tu base:
+
+```bash
+uv run pytest
+```
+
+- Correr las pruebas contra PostgreSQL. Usa una base solo para pruebas: **se borran todas sus tablas**:
+
+```bash
+TEST_DATABASE_URL="postgresql://usuario:clave@localhost:5432/fraud_test" uv run pytest
+```
+
+GitHub Actions corre ruff y las pruebas en cada push a `main`, y solo si pasan se publica en Hugging Face.
 
 ## 🐳 Docker
 

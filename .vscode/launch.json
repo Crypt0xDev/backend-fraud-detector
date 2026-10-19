@@ -1,0 +1,25 @@
+{
+  // Opciones que aparecen al pulsar F5
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // Levanta la API en http://localhost:8000 y se reinicia al guardar
+      "name": "API (uvicorn --reload)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["main:app", "--reload", "--port", "8000"],
+      "envFile": "${workspaceFolder}/.env",
+      "justMyCode": true
+    },
+    {
+      // Corre todas las pruebas; puedes poner puntos de parada en ellas
+      "name": "Pruebas (pytest)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["-q"],
+      "justMyCode": false
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  // VS Code te sugiere instalarlas al abrir el proyecto
+  // El analizador de tipos (Pylance o basedpyright) lo elige cada uno
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.debugpy",
+    "charliermarsh.ruff"
+  ],
+
+  // Mejor no usarlas aquí: formatean o revisan distinto que ruff y chocan con él
+  "unwantedRecommendations": [
+    "ms-python.black-formatter",
+    "ms-python.autopep8",
+    "ms-python.isort",
+    "ms-python.flake8",
+    "ms-python.pylint"
+  ]
+}
