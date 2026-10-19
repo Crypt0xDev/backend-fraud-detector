@@ -1,5 +1,9 @@
+# Todo lo que necesita la API para funcionar
 -r requirements.txt
 
-# Pruebas (TestClient de Starlette 1.x usa httpx2)
+# Revisar y dar formato al código (la misma versión que usa GitHub Actions)
+ruff==0.17.0
+
+# Para correr las pruebas (el TestClient de Starlette 1.x necesita httpx2)
 pytest==9.1.1
 httpx2==2.14.0
