@@ -20,7 +20,7 @@ class StorageError(RuntimeError):
 
 
 class FileStorage(Protocol):
-    """Lo que necesitan los casos de uso, sea Supabase o disco local."""
+    """Lo que se puede hacer con el almacenamiento, sea Supabase o el disco"""
 
     def upload(self, path: str, content: bytes, content_type: str) -> None: ...
 
@@ -30,7 +30,7 @@ class FileStorage(Protocol):
 
 
 class SupabaseStorage:
-    """Cliente mínimo de la API REST de Supabase Storage para un bucket privado."""
+    """Guarda los archivos en un bucket privado de Supabase Storage"""
 
     def __init__(self, url: str, secret_key: str, bucket: str):
         self.base = f"{url.rstrip('/')}/storage/v1"
@@ -101,15 +101,14 @@ class SupabaseStorage:
 
 
 class LocalStorage:
-    """Guarda los archivos en disco. Las descargas pasan por la API con un token
-    firmado de corta duración, igual que las URL firmadas de Supabase."""
+    """Guarda los archivos en el disco"""
 
     def __init__(self, root: Path, download_url: str):
         self.root = root.resolve()
         self.download_url = download_url
 
     def resolve(self, path: str) -> Path:
-        """Ruta absoluta dentro de `root`; rechaza rutas que intenten salir de ella."""
+        """Ruta del archivo dentro de la carpeta; no deja salir de ella"""
         target = (self.root / path).resolve()
         if not target.is_relative_to(self.root):
             raise StorageError(f"Ruta fuera del almacenamiento: {path}")
@@ -160,8 +159,7 @@ def open_storage(
     supabase_secret_key: str | None,
     bucket: str,
 ) -> FileStorage | None:
-    """Crea el almacenamiento según STORAGE_BACKEND. Sin definir, usa Supabase si
-    está configurado (el comportamiento anterior) y si no, no guarda lotes."""
+    """Elige el almacenamiento según STORAGE_BACKEND"""
     if backend is None:
         backend = "supabase" if supabase_url and supabase_secret_key else None
     if backend is None:

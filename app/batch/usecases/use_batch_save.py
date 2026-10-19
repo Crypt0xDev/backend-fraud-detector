@@ -1,16 +1,18 @@
 import logging
 from uuid import UUID, uuid4
 
-from app.batch.batch_repository import BatchRepository
+from sqlalchemy.orm import Session
+
+from app.batch.batch_entity import Batch
 from app.batch.batch_storage import object_paths
 from utils.storage import FileStorage, StorageError
 
 logger = logging.getLogger(__name__)
 
 
-def save_batch(
+def execute(
+    db: Session,
     storage: FileStorage,
-    batches: BatchRepository,
     *,
     username: str,
     file_name: str,
@@ -20,14 +22,25 @@ def save_batch(
     total_rows: int,
     threshold: float,
 ) -> UUID | None:
-    """Guarda ambos CSV y el registro; si algo falla, el análisis se devuelve igual."""
+    """Guarda los dos CSV y el lote. Si falla, igual se devuelve el análisis"""
     batch_id = uuid4()
     input_path, predictions_path = paths = object_paths(batch_id)
     try:
         storage.upload(input_path, original, "text/csv")
         storage.upload(predictions_path, predictions, "text/csv")
-        batches.add(batch_id, username, file_name, total_rows, flagged_rows, threshold)
+        db.add(
+            Batch(
+                id=batch_id,
+                username=username,
+                file_name=file_name,
+                total_rows=total_rows,
+                flagged_rows=flagged_rows,
+                threshold=threshold,
+            )
+        )
+        db.commit()
     except Exception:
+        db.rollback()
         logger.exception("No se pudo guardar el lote %s", batch_id)
         try:
             storage.delete(paths)

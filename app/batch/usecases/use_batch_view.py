@@ -1,15 +1,13 @@
 from uuid import UUID
 
-from app.batch.batch_repository import BatchRepository
-from app.batch.batch_schema import BatchOut
+from sqlalchemy.orm import Session
+
+from app.batch.batch_entity import Batch
+from app.batch.batch_scope import visible_to
+from app.user.user_entity import User
 
 
-class BatchNotFoundError(Exception):
-    pass
-
-
-def view_batch(batches: BatchRepository, owner: str | None, batch_id: UUID) -> BatchOut:
-    batch = batches.get(owner, batch_id)
-    if batch is None:
-        raise BatchNotFoundError
-    return batch
+def execute(db: Session, current_user: User, batch_id: UUID) -> Batch | None:
+    return (
+        db.query(Batch).filter(*visible_to(current_user), Batch.id == batch_id).first()
+    )

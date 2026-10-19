@@ -1,23 +1,32 @@
 from uuid import UUID
-from zoneinfo import available_timezones
 
-from fastapi import APIRouter, HTTPException, Query, Response, status
+# fastapi
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from fastapi.responses import FileResponse
+from sqlalchemy.orm import Session
 
-from app.batch.batch_dependency import Batches, Storage
+# dependencias
+from app.auth.auth_dependency import require_permission
+from app.batch.batch_dependency import get_storage
+
+# esquemas
 from app.batch.batch_schema import (
     BatchFile,
     BatchFileUrlOut,
     BatchPageOut,
     BatchStatsOut,
 )
-from app.batch.usecases.use_batch_delete import delete_batch
-from app.batch.usecases.use_batch_file_url import batch_file_url
-from app.batch.usecases.use_batch_list import list_batches
-from app.batch.usecases.use_batch_stats import batch_stats
-from app.batch.usecases.use_batch_view import BatchNotFoundError
-from utils.auth import CurrentUser, Users, is_admin
-from utils.storage import LocalStorage, StorageError
+
+# casos de uso
+from app.batch.usecases.use_batch_delete import execute as delete_batch_execute
+from app.batch.usecases.use_batch_file_url import execute as file_url_batch_execute
+from app.batch.usecases.use_batch_list import execute as list_batch_execute
+from app.batch.usecases.use_batch_stats import execute as stats_batch_execute
+
+# entidades
+from app.user.user_entity import User
+from config.database import get_db
+from utils.storage import FileStorage, LocalStorage, StorageError
 from utils.token import decode_download_token
 
 router = APIRouter(prefix="/batches", tags=["batches"])
@@ -31,80 +40,54 @@ def not_found() -> HTTPException:
     )
 
 
-def storage_failed() -> HTTPException:
-    return HTTPException(
-        status_code=status.HTTP_502_BAD_GATEWAY,
-        detail="No se pudo acceder al almacenamiento de archivos",
-    )
-
-
-def scope(users: Users, username: str) -> str | None:
-    """None (todos los lotes) para un admin; el propio usuario para el resto."""
-    return None if is_admin(users, username) else username
-
-
-def owner(users: Users, username: str, all: bool) -> str | None:
-    if all and not is_admin(users, username):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Solo un administrador puede ver los lotes de todos",
-        )
-    return None if all else username
-
-
 @router.get("", response_model=BatchPageOut)
-def list_route(
-    username: CurrentUser,
-    users: Users,
-    batches: Batches,
+def list_batch_endpoint(
     all: bool = False,
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=10, ge=1, le=100),
-) -> BatchPageOut:
-    """Lotes propios, paginados; con `all=true` (solo admin), los de todos."""
-    return list_batches(batches, owner(users, username, all), page, page_size)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_permission("lotes", "ver")),
+):
+    """Listar los lotes del usuario; con `all` el root ve todos"""
+    return list_batch_execute(
+        db=db, current_user=current_user, all=all, page=page, page_size=page_size
+    )
 
 
 @router.get("/stats", response_model=BatchStatsOut)
-def stats_route(
-    username: CurrentUser,
-    users: Users,
-    batches: Batches,
+def stats_batch_endpoint(
     all: bool = False,
     days: int = Query(default=14, ge=1, le=90),
     tz: str = "UTC",
-) -> BatchStatsOut:
-    """Totales y serie diaria de los lotes; `all=true` (solo admin) suma los de todos.
-    `tz` (IANA, p. ej. America/Lima) define a qué día pertenece cada lote."""
-    if tz not in available_timezones():
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail=f"Zona horaria no válida: {tz}",
-        )
-    return batch_stats(batches, owner(users, username, all), days, tz)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_permission("lotes", "ver")),
+):
+    """Totales de los lotes y cuántos hubo por día"""
+    return stats_batch_execute(
+        db=db, current_user=current_user, all=all, days=days, tz=tz
+    )
 
 
 @router.get("/{batch_id}/files/{kind}", response_model=BatchFileUrlOut)
-def file_url_route(
+def file_url_batch_endpoint(
     batch_id: UUID,
     kind: BatchFile,
-    username: CurrentUser,
-    users: Users,
-    batches: Batches,
-    storage: Storage,
-) -> BatchFileUrlOut:
-    try:
-        return batch_file_url(batches, storage, scope(users, username), batch_id, kind)
-    except BatchNotFoundError as error:
-        raise not_found() from error
-    except StorageError as error:
-        raise storage_failed() from error
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_permission("lotes", "ver")),
+    storage: FileStorage = Depends(get_storage),
+):
+    """Enlace de 5 minutos para descargar el CSV original o el de resultados"""
+    file_url = file_url_batch_execute(
+        db=db, current_user=current_user, storage=storage, batch_id=batch_id, kind=kind
+    )
+    if file_url is None:
+        raise not_found()
+    return file_url
 
 
 @router.get(DOWNLOAD_PATH, response_class=FileResponse)
-def download_route(token: str, storage: Storage) -> FileResponse:
-    """Descarga de un archivo del almacenamiento local. La autoriza el token de la URL
-    firmada (5 min), no la sesión, para que funcione como enlace directo."""
+def download_route(token: str, storage: FileStorage = Depends(get_storage)):
+    """Descarga de un archivo del almacenamiento local"""
     if not isinstance(storage, LocalStorage):
         raise not_found()
     claims = decode_download_token(token)
@@ -123,18 +106,25 @@ def download_route(token: str, storage: Storage) -> FileResponse:
     return FileResponse(target, media_type="text/csv", filename=name)
 
 
-@router.delete("/{batch_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_route(
+@router.delete(
+    "/{batch_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_class=Response,
+    responses={
+        204: {"description": "Lote eliminado correctamente"},
+        404: {"description": "Lote no encontrado"},
+    },
+)
+def delete_batch_endpoint(
     batch_id: UUID,
-    username: CurrentUser,
-    users: Users,
-    batches: Batches,
-    storage: Storage,
-) -> Response:
-    try:
-        delete_batch(batches, storage, scope(users, username), batch_id)
-    except BatchNotFoundError as error:
-        raise not_found() from error
-    except StorageError as error:
-        raise storage_failed() from error
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_permission("lotes", "eliminar")),
+    storage: FileStorage = Depends(get_storage),
+):
+    """Eliminar un lote y sus archivos"""
+    success = delete_batch_execute(
+        db=db, current_user=current_user, storage=storage, batch_id=batch_id
+    )
+    if not success:
+        raise not_found()
     return Response(status_code=status.HTTP_204_NO_CONTENT)

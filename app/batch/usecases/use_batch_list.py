@@ -1,13 +1,24 @@
-from app.batch.batch_repository import BatchRepository
-from app.batch.batch_schema import BatchPageOut
+from sqlalchemy.orm import Session
+
+from app.batch.batch_entity import Batch
+from app.batch.batch_schema import BatchOut, BatchPageOut
+from app.batch.batch_scope import requested_by
+from app.user.user_entity import User
 
 
-def list_batches(
-    batches: BatchRepository, owner: str | None, page: int, page_size: int
+def execute(
+    db: Session, current_user: User, all: bool, page: int, page_size: int
 ) -> BatchPageOut:
+    query = db.query(Batch).filter(*requested_by(current_user, all))
+    batches = (
+        query.order_by(Batch.created_at.desc(), Batch.id.desc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+        .all()
+    )
     return BatchPageOut(
-        items=batches.list(owner, limit=page_size, offset=(page - 1) * page_size),
-        total=batches.count(owner),
+        items=[BatchOut.model_validate(b, from_attributes=True) for b in batches],
+        total=query.count(),
         page=page,
         page_size=page_size,
     )
