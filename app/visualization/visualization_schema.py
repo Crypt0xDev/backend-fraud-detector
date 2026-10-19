@@ -11,7 +11,7 @@ class SamplePointOut(BaseModel):
     amount: float
     oldbalanceOrg: float
     oldbalanceDest: float
-    # Etiqueta real del dataset (isFraud), predicción (alert) y score: no se mezclan
+    # isFraud es lo real del dataset; alert y score son lo que dice el modelo
     label: Literal[0, 1]
     alert: Literal[0, 1]
     score: float
@@ -31,7 +31,7 @@ class SampleOut(BaseModel):
 
 
 class DatasetProfileOut(BaseModel):
-    """Perfil del CSV de PaySim generado por ml-fraud-training/profile_data.py."""
+    """Resumen del CSV de PaySim, sale de ml-fraud-training/profile_data.py"""
 
     model_config = ConfigDict(extra="allow")
 
