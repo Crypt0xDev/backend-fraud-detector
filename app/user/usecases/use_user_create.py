@@ -1,15 +1,15 @@
-from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.user.usecases.use_user_roles import default_roles, resolve_roles
 from app.user.user_entity import User
 from app.user.user_schema import ACTIVE, SchemaCreate
+from utils.errors import ConflictError
 from utils.password import hash_password
 
 
-def execute(db: Session, current_user: User, user: SchemaCreate) -> User:
-    root = user.root or user.role == "admin"
+def execute(db: Session, user: SchemaCreate) -> User:
+    root = user.root
     db_user = User(
         username=user.username,
         password_hash=hash_password(user.password),
@@ -30,8 +30,6 @@ def execute(db: Session, current_user: User, user: SchemaCreate) -> User:
         db.rollback()
         if db.get(User, user.username) is None:
             raise
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail="El usuario ya existe"
-        ) from error
+        raise ConflictError("El usuario ya existe") from error
     db.refresh(db_user)
     return db_user

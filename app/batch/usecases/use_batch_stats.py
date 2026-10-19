@@ -1,7 +1,6 @@
 from datetime import UTC, date, datetime, time, timedelta
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from fastapi import HTTPException, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -9,6 +8,7 @@ from app.batch.batch_entity import Batch
 from app.batch.batch_schema import BatchDayOut, BatchStatsOut
 from app.batch.batch_scope import requested_by
 from app.user.user_entity import User
+from utils.errors import InvalidDataError
 
 
 def execute(
@@ -23,10 +23,7 @@ def execute(
     try:
         zone = ZoneInfo(tz)
     except (ZoneInfoNotFoundError, ValueError) as error:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail=f"Zona horaria no válida: {tz}",
-        ) from error
+        raise InvalidDataError(f"Zona horaria no válida: {tz}") from error
     owner = requested_by(current_user, all)
     today = today or datetime.now(zone).date()
     since = today - timedelta(days=days - 1)

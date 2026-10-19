@@ -2,12 +2,12 @@ import threading
 
 import pytest
 from conftest import ADMIN, ANALYST, login
-from fastapi import HTTPException
 
 from app.user.usecases.use_user_roles import ensure_not_last_root
 from app.user.user_entity import User
 from app.user.user_schema import ACTIVE
 from config import database
+from utils.errors import ConflictError
 from utils.password import hash_password
 
 
@@ -154,17 +154,19 @@ def test_ultimo_root_con_peticiones_simultaneas(client, is_postgres):
     errors: list[int] = []
     try:
         target = first.get(User, "root2")
+        assert target is not None
         ensure_not_last_root(first, target)  # bloquea las filas de los roots
 
         def disable_admin():
             other = second.get(User, ADMIN[0])
+            assert other is not None
             try:
                 ensure_not_last_root(second, other)
                 other.state = "Inactivo"
                 second.commit()
-            except HTTPException as error:
+            except ConflictError:
                 second.rollback()
-                errors.append(error.status_code)
+                errors.append(409)
 
         thread = threading.Thread(target=disable_admin)
         thread.start()

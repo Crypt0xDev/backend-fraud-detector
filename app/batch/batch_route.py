@@ -77,12 +77,9 @@ def file_url_batch_endpoint(
     storage: FileStorage = Depends(get_storage),
 ):
     """Enlace de 5 minutos para descargar el CSV original o el de resultados"""
-    file_url = file_url_batch_execute(
+    return file_url_batch_execute(
         db=db, current_user=current_user, storage=storage, batch_id=batch_id, kind=kind
     )
-    if file_url is None:
-        raise not_found()
-    return file_url
 
 
 @router.get(DOWNLOAD_PATH, response_class=FileResponse)
@@ -122,9 +119,7 @@ def delete_batch_endpoint(
     storage: FileStorage = Depends(get_storage),
 ):
     """Eliminar un lote y sus archivos"""
-    success = delete_batch_execute(
+    delete_batch_execute(
         db=db, current_user=current_user, storage=storage, batch_id=batch_id
     )
-    if not success:
-        raise not_found()
     return Response(status_code=status.HTTP_204_NO_CONTENT)

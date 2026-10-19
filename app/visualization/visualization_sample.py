@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Hashable
 from pathlib import Path
 
 import pandas as pd
@@ -7,7 +8,7 @@ from app.visualization.visualization_schema import SampleOut, SamplePointOut
 
 logger = logging.getLogger(__name__)
 
-COLUMNS = {
+COLUMNS: dict[Hashable, str] = {
     "step": "int32",
     "type": "string",
     "amount": "float64",
@@ -52,7 +53,7 @@ def filter_sample(
         mask &= sample["step"] >= step_min
     if step_max is not None:
         mask &= sample["step"] <= step_max
-    matched = sample[mask]
+    matched = sample.loc[mask]
     chosen = (
         matched if len(matched) <= limit else matched.sample(limit, random_state=seed)
     )

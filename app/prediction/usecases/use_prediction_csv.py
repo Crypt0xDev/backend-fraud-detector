@@ -2,8 +2,6 @@ import io
 from typing import IO, Any
 
 import pandas as pd
-from fastapi import HTTPException, status
-from fastapi.exceptions import RequestValidationError
 from pydantic import TypeAdapter, ValidationError
 from sqlalchemy.orm import Session
 
@@ -12,6 +10,7 @@ from app.prediction.prediction_port import BatchArchive
 from app.prediction.prediction_schema import Prediction, PredictOut, Transaction
 from app.prediction.usecases.use_prediction_predict import predict_transactions
 from app.user.user_entity import User
+from utils.errors import InvalidDataError, InvalidRowsError
 
 transactions_adapter = TypeAdapter(list[Transaction])
 
@@ -78,11 +77,9 @@ def execute(
     try:
         frame, transactions = read_csv(io.BytesIO(original), max_rows)
     except InvalidCSVError as error:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(error)
-        ) from error
+        raise InvalidDataError(str(error)) from error
     except ValidationError as error:
-        raise RequestValidationError(
+        raise InvalidRowsError(
             error.errors(include_url=False, include_context=False)
         ) from error
 

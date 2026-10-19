@@ -1,13 +1,5 @@
 # fastapi
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    Query,
-    Request,
-    Response,
-    status,
-)
+from fastapi import APIRouter, Depends, Query, Request, Response, status
 from sqlalchemy.orm import Session
 
 # dependencias
@@ -39,26 +31,29 @@ from config.database import get_db
 
 router = APIRouter(prefix="/users", tags=["users"])
 
+# Para los endpoints que solo puede usar el root y no necesitan saber quién es
+ROOT_ONLY = [Depends(get_current_root)]
 
-@router.post("", response_model=SchemaResponse, status_code=status.HTTP_201_CREATED)
-def create_user_endpoint(
-    user: SchemaCreate,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_root),
-):
+
+@router.post(
+    "",
+    response_model=SchemaResponse,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=ROOT_ONLY,
+)
+def create_user_endpoint(user: SchemaCreate, db: Session = Depends(get_db)):
     """Crear un usuario. Solo el root"""
-    return create_user_execute(db=db, current_user=current_user, user=user)
+    return create_user_execute(db=db, user=user)
 
 
-@router.get("", response_model=list[SchemaResponse])
+@router.get("", response_model=list[SchemaResponse], dependencies=ROOT_ONLY)
 def list_user_endpoint(
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=50, ge=1, le=100),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_root),
 ):
     """Listar todos los usuarios"""
-    return list_user_execute(db=db, current_user=current_user, skip=skip, limit=limit)
+    return list_user_execute(db=db, skip=skip, limit=limit)
 
 
 @router.patch(
@@ -72,27 +67,14 @@ def change_password_endpoint(
     current_user: User = Depends(get_current_user),
 ):
     """Cambiar la contraseña del usuario que inició sesión; cierra sus sesiones"""
-    success = change_password_user_execute(db=db, current_user=current_user, data=data)
-    if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado"
-        )
+    change_password_user_execute(db=db, current_user=current_user, data=data)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.get("/{username}", response_model=SchemaResponse)
-def view_user_endpoint(
-    username: str,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_root),
-):
+@router.get("/{username}", response_model=SchemaResponse, dependencies=ROOT_ONLY)
+def view_user_endpoint(username: str, db: Session = Depends(get_db)):
     """Ver un usuario específico"""
-    user = view_user_execute(db=db, current_user=current_user, username=username)
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado"
-        )
-    return user
+    return view_user_execute(db=db, username=username)
 
 
 @router.patch("/{username}", response_model=SchemaResponse)
@@ -103,14 +85,9 @@ def update_user_endpoint(
     current_user: User = Depends(get_current_root),
 ):
     """Actualizar el rol o la contraseña de un usuario"""
-    user = update_user_execute(
+    return update_user_execute(
         db=db, current_user=current_user, username=username, user_data=user_data
     )
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado"
-        )
-    return user
 
 
 @router.delete(
@@ -129,16 +106,12 @@ def delete_user_endpoint(
     current_user: User = Depends(get_current_root),
 ):
     """Eliminar un usuario junto con sus lotes, predicciones y archivos"""
-    success = delete_user_execute(
+    delete_user_execute(
         db=db,
         current_user=current_user,
         username=username,
         cleaners=request.app.state.user_data_cleaners,
     )
-    if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado"
-        )
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
@@ -146,19 +119,11 @@ def delete_user_endpoint(
     "/{username}/enable",
     status_code=status.HTTP_204_NO_CONTENT,
     response_class=Response,
+    dependencies=ROOT_ONLY,
 )
-def enable_user_endpoint(
-    username: str,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_root),
-):
+def enable_user_endpoint(username: str, db: Session = Depends(get_db)):
     """Habilitar un usuario"""
-    success = enable_user_execute(db=db, current_user=current_user, username=username)
-    if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuario no encontrado o ya está habilitado",
-        )
+    enable_user_execute(db=db, username=username)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
@@ -173,10 +138,5 @@ def disable_user_endpoint(
     current_user: User = Depends(get_current_root),
 ):
     """Deshabilitar un usuario: no podrá iniciar sesión hasta que se habilite"""
-    success = disable_user_execute(db=db, current_user=current_user, username=username)
-    if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuario no encontrado o ya está deshabilitado",
-        )
+    disable_user_execute(db=db, current_user=current_user, username=username)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

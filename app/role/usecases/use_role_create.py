@@ -7,12 +7,9 @@ from app.role.usecases.use_role_permissions import (
     to_response,
     validate_module_permission_ids,
 )
-from app.user.user_entity import User
 
 
-def execute(
-    db: Session, current_user: User, role: SchemaRoleCreate
-) -> SchemaRoleResponse:
+def execute(db: Session, role: SchemaRoleCreate) -> SchemaRoleResponse:
     # Validar que los IDs de permisos existen
     validate_module_permission_ids(db, role.module_permission_ids)
 

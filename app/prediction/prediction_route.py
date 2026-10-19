@@ -85,12 +85,6 @@ def history_prediction_endpoint(
 
 
 @router.post("/predict/batch", response_model=PredictOut, dependencies=[RateLimited])
-@router.post(
-    "/predict/csv",
-    response_model=PredictOut,
-    dependencies=[RateLimited],
-    deprecated=True,
-)
 def csv_prediction_endpoint(
     request: Request,
     file: UploadFile,

@@ -1,13 +1,9 @@
 import logging
-import math
 from contextlib import asynccontextmanager
-from typing import Any
 
 from fastapi import FastAPI, Request
-from fastapi.encoders import jsonable_encoder
-from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import RedirectResponse
 from starlette.datastructures import State
 
 from app.batch.batch_adapter import BatchFilesCleaner, StorageBatchArchive
@@ -15,8 +11,9 @@ from app.model.model_schema import MetricsOut
 from app.prediction.prediction_features import AVAILABLE_COLUMNS
 from app.prediction.prediction_policy import build_policy
 from app.visualization.visualization_sample import load_sample
-from config import database, entities  # noqa: F401  (carga las entidades)
+from config import database, entities  # noqa: F401  (registra las tablas)
 from config.create_default_records import run_all_seeders
+from config.error_handlers import register_error_handlers
 from config.routes import api_router
 from config.settings import API_PREFIX, settings
 from config.startup_summary import log_startup_summary
@@ -93,32 +90,14 @@ app.add_middleware(
 app.include_router(api_router, prefix=API_PREFIX)
 
 
-def json_safe(value: Any) -> Any:
-    """Cambia Infinity y NaN por texto: JSON no los admite y el 422 daba error 500"""
-    if isinstance(value, float) and not math.isfinite(value):
-        return str(value)
-    if isinstance(value, dict):
-        return {key: json_safe(item) for key, item in value.items()}
-    if isinstance(value, list | tuple):
-        return [json_safe(item) for item in value]
-    return value
-
-
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(
-    request: Request, exc: RequestValidationError
-) -> JSONResponse:
-    """El mismo 422 de FastAPI, aunque la entrada traiga números no finitos"""
-    return JSONResponse(
-        status_code=422, content={"detail": json_safe(jsonable_encoder(exc.errors()))}
-    )
+register_error_handlers(app)
 
 
 @app.get("/", include_in_schema=False)
 @app.get("/api", include_in_schema=False)
 def root_endpoint():
     """Redirige a la documentación"""
-    return RedirectResponse(app.docs_url)
+    return RedirectResponse(app.docs_url or "/docs")
 
 
 @app.get(API_PREFIX, tags=["index"])

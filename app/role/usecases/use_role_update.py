@@ -4,19 +4,19 @@ from app.role.role_entity import Role, RolePermission
 from app.role.role_schema import SchemaRoleResponse, SchemaRoleUpdate
 from app.role.usecases.use_role_permissions import (
     commit_unique_name,
+    role_not_found,
     to_response,
     validate_module_permission_ids,
 )
-from app.user.user_entity import User
 from utils.helpers import utcnow
 
 
 def execute(
-    db: Session, current_user: User, role_id: int, role_data: SchemaRoleUpdate
-) -> SchemaRoleResponse | None:
+    db: Session, role_id: int, role_data: SchemaRoleUpdate
+) -> SchemaRoleResponse:
     db_role = db.query(Role).filter(Role.id == role_id).first()
     if db_role is None:
-        return None
+        raise role_not_found()
 
     # Validar que los IDs de permisos existen
     validate_module_permission_ids(db, role_data.module_permission_ids)

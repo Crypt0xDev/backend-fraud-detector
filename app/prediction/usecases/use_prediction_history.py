@@ -1,4 +1,3 @@
-from fastapi import HTTPException, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -6,6 +5,7 @@ from app.auth.auth_dependency import is_root
 from app.prediction.prediction_entity import PredictionRecord
 from app.prediction.prediction_schema import PredictionHistoryOut, PredictionRecordOut
 from app.user.user_entity import User
+from utils.errors import ForbiddenError
 
 
 def execute(
@@ -18,9 +18,8 @@ def execute(
 ) -> PredictionHistoryOut:
     """Últimas transacciones analizadas; con `all` el root ve las de todos"""
     if all and not is_root(current_user):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Solo un administrador puede ver las predicciones de todos",
+        raise ForbiddenError(
+            "Solo un administrador puede ver las predicciones de todos"
         )
     owner = [] if all else [PredictionRecord.username == current_user.username]
 

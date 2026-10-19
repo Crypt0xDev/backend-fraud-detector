@@ -4,15 +4,10 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, field_validator
 
+from utils.schemas import BaseSchema
+
 # Rol que se le da a un usuario si no se elige otro
 ANALYST_ROLE = "Analista"
-
-
-class BaseSchema(BaseModel):
-    model_config = {
-        "str_strip_whitespace": True,
-        "extra": "forbid",
-    }
 
 
 # Inicio del registro de un rol

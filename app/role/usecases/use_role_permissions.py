@@ -1,10 +1,10 @@
-from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, joinedload, selectinload
 
 from app.module.module_entity import ModulePermission
 from app.role.role_entity import Role, RolePermission
 from app.role.role_schema import SchemaRoleResponse
+from utils.errors import ConflictError, InvalidRequestError, NotFoundError
 
 
 def validate_module_permission_ids(db: Session, ids: list[int]) -> None:
@@ -17,10 +17,13 @@ def validate_module_permission_ids(db: Session, ids: list[int]) -> None:
     }
     missing = sorted(set(ids) - found)
     if missing:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Los siguientes IDs de permisos de módulo no existen: {missing}",
+        raise InvalidRequestError(
+            f"Los siguientes IDs de permisos de módulo no existen: {missing}"
         )
+
+
+def role_not_found() -> NotFoundError:
+    return NotFoundError("Rol no encontrado")
 
 
 def with_permissions():
@@ -41,10 +44,7 @@ def commit_unique_name(db: Session, name: str) -> None:
         db.rollback()
         if db.query(Role.id).filter(Role.name == name).first() is None:
             raise
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Ya existe un rol con ese nombre",
-        ) from error
+        raise ConflictError("Ya existe un rol con ese nombre") from error
 
 
 def to_response(role: Role) -> SchemaRoleResponse:

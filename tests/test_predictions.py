@@ -151,7 +151,12 @@ def test_csv_escapa_formulas_en_el_resultado(client, analyst):
 
 def test_csv_no_valido(client, analyst, monkeypatch):
     assert upload(client, analyst, b"").status_code == 422
-    assert upload(client, analyst, b"a,b\n1,2\n").status_code == 422
+    # Filas que no son de PaySim: el detalle es la lista de errores de validación
+    response = upload(client, analyst, b"a,b\n1,2\n")
+    assert response.status_code == 422
+    errors = response.json()["detail"]
+    assert isinstance(errors, list)
+    assert {"loc", "msg", "type"} <= set(errors[0])
     assert upload(client, analyst, f"{CSV_HEADER}\n".encode()).status_code == 422
 
     monkeypatch.setattr(settings, "max_batch_rows", 2)

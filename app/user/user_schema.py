@@ -2,13 +2,11 @@ import re
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field, ValidationInfo, computed_field, field_validator
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 from app.role.role_schema import SchemaRoleBasic
 from utils.password import MIN_PASSWORD_LENGTH
-
-Role = Literal["admin", "user"]
-ROLES: tuple[Role, ...] = ("admin", "user")
+from utils.schemas import BaseSchema
 
 UserState = Literal["Activo", "Inactivo"]
 ACTIVE: UserState = "Activo"
@@ -24,13 +22,6 @@ def check_username(username: str) -> str:
     return username
 
 
-class BaseSchema(BaseModel):
-    model_config = {
-        "str_strip_whitespace": True,
-        "extra": "forbid",
-    }
-
-
 # Inicio del registro de un usuario
 class SchemaCreate(BaseSchema):
     username: str = Field(..., min_length=1, max_length=150)
@@ -38,7 +29,6 @@ class SchemaCreate(BaseSchema):
     root: bool = False
     # Si no se envían roles, se le da Analista
     role_ids: list[int] = Field(default_factory=list)
-    role: Role | None = Field(None, deprecated="Usa root: admin equivale a root=true")
 
     @field_validator("username")
     @classmethod
@@ -62,7 +52,6 @@ class SchemaUpdate(BaseSchema):
     root: bool | None = None
     # Reemplaza los roles del usuario por estos
     role_ids: list[int] | None = None
-    role: Role | None = Field(None, deprecated="Usa root: admin equivale a root=true")
 
     @field_validator("role_ids")
     @classmethod
@@ -102,12 +91,6 @@ class SchemaResponse(BaseModel):
     updated_at: datetime | None = None
 
     model_config = {"from_attributes": True}
-
-    @computed_field(deprecated="Usa root y roles")
-    @property
-    def role(self) -> Role:
-        """Para el frontend anterior: admin si es root, si no user"""
-        return "admin" if self.root else "user"
 
 
 # Fin del response

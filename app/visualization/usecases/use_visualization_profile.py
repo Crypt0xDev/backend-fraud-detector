@@ -1,12 +1,11 @@
 from typing import Any
 
-from fastapi import HTTPException, status
+from utils.errors import UnavailableError
 
 
-def unavailable(what: str) -> HTTPException:
-    return HTTPException(
-        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-        detail=f"{what} no está disponible: copia los artefactos del entrenamiento",
+def unavailable(what: str) -> UnavailableError:
+    return UnavailableError(
+        f"{what} no está disponible: copia los artefactos del entrenamiento"
     )
 
 

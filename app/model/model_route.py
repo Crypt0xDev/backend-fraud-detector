@@ -1,5 +1,5 @@
 # fastapi
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, Request
 
 # dependencias
 from app.auth.auth_dependency import require_permission
@@ -79,13 +79,8 @@ def list_experiment_endpoint(request: Request):
 )
 def view_experiment_endpoint(version: str, request: Request):
     """Ver un experimento por su versión"""
-    experiment = view_experiment_execute(
+    return view_experiment_execute(
         experiments=request.app.state.experiments,
         metrics=request.app.state.metrics,
         version=version,
     )
-    if experiment is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="El experimento no existe"
-        )
-    return experiment

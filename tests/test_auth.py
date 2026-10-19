@@ -24,6 +24,7 @@ def test_login_falla_con_contrasena_o_usuario_incorrectos(client):
         )
         assert response.status_code == 401
         assert response.json()["detail"] == "Usuario o contraseña incorrectos"
+        assert response.headers["WWW-Authenticate"] == "Bearer"
 
 
 def test_me_sin_token_o_con_token_falso(client):

@@ -5,10 +5,13 @@ import getpass
 import sys
 
 from app.role.role_schema import ANALYST_ROLE
-from app.user.user_schema import ACTIVE, ROLES, check_username
+from app.user.user_schema import ACTIVE, check_username
 from config.database import SessionLocal, engine, init_db
 from config.entities import Role, User
 from utils.password import MIN_PASSWORD_LENGTH, hash_password
+
+# admin = root; user = rol Analista
+ROLES = ("admin", "user")
 
 
 def main() -> None:
