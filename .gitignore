@@ -2,17 +2,20 @@
 .venv/
 .env
 
-# Artefactos del modelo (se copian desde el repo de entrenamiento)
+# Artifacts
 ml/artifacts/*
 !ml/artifacts/.gitkeep
 !ml/artifacts/pipeline.joblib
 !ml/artifacts/metrics.json
+!ml/artifacts/experiments.json
+!ml/artifacts/dataset_profile.json
+!ml/artifacts/sample.csv
 
 # Python
 __pycache__/
 *.py[cod]
-.pytest_cache/
 .ruff_cache/
+.pytest_cache/
 
 # Editor / SO
 .vscode/

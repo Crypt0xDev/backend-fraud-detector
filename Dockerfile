@@ -5,7 +5,7 @@ WORKDIR /app
 
 COPY requirements.txt .
 RUN sed -e 's/^xgboost==/xgboost-cpu==/' \
-        -e '/^\(pytest\|httpx2\|ruff\)==/d' \
+        -e '/^ruff==/d' \
         requirements.txt > /tmp/requirements.txt \
     && pip install --no-cache-dir -r /tmp/requirements.txt
 RUN useradd --create-home --uid 1000 app
