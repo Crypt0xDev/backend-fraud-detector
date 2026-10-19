@@ -1,0 +1,46 @@
+name: Sincronizar con Hugging Face
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: hf-deploy
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Revisar el código
+        run: pipx run ruff==0.17.0 check .
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      # Si fallan las pruebas no se despliega
+      - name: Pruebas
+        run: |
+          pip install -r requirements-dev.txt
+          pytest -q
+
+      - name: Preparar el README para Hugging Face
+        run: |
+          cat .github/hf-space.md README.md > README.hf && mv README.hf README.md
+          git -c user.name=github-actions -c user.email=actions@github.com \
+            commit -am "Configuración del Space"
+
+      - name: Subir al Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          git push --force \
+            "https://Crypt0xDev:${HF_TOKEN}@huggingface.co/spaces/Crypt0xDev/backend-fraud-detector" \
+            HEAD:main
