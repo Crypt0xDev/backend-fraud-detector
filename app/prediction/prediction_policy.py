@@ -7,7 +7,7 @@ DEFAULT_THRESHOLD = 0.5
 
 @dataclass(frozen=True)
 class RiskPolicy:
-    """Política de decisión: score >= high genera alerta; medium marca revisión."""
+    """Umbrales del score: desde high es alerta y desde medium hay que revisarla"""
 
     medium: float
     high: float
@@ -20,7 +20,7 @@ class RiskPolicy:
 
 
 def build_policy(metrics: Any, override: float | None) -> RiskPolicy:
-    """Umbrales elegidos en validación (metrics.json); FRAUD_THRESHOLD los fuerza."""
+    """Toma los umbrales de metrics.json, o FRAUD_THRESHOLD si está definido"""
     info = metrics.model_dump() if metrics is not None else {}
     levels = info.get("risk_levels") or {}
     trained = levels.get("high", info.get("threshold"))

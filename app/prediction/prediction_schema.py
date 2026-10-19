@@ -2,24 +2,30 @@ from datetime import datetime
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.prediction.prediction_policy import RiskLevel
 from config.settings import settings
 
 TransactionType = Literal["CASH_IN", "CASH_OUT", "DEBIT", "PAYMENT", "TRANSFER"]
 
+# En PaySim miden 11 caracteres; se guardan en el historial
+MAX_NAME_LENGTH = 100
+
 
 class Transaction(BaseModel):
-    """Transacción con las columnas originales de PaySim (sin las etiquetas)."""
+    """Una transacción con las columnas de PaySim"""
+
+    # Sin Infinity ni NaN: no son montos y se guardarían en el historial
+    model_config = ConfigDict(allow_inf_nan=False)
 
     step: int = Field(ge=0)
     type: TransactionType
     amount: float = Field(ge=0)
-    nameOrig: str | None = None
+    nameOrig: str | None = Field(default=None, max_length=MAX_NAME_LENGTH)
     oldbalanceOrg: float = Field(ge=0)
     newbalanceOrig: float = Field(ge=0)
-    nameDest: str | None = None
+    nameDest: str | None = Field(default=None, max_length=MAX_NAME_LENGTH)
     oldbalanceDest: float = Field(ge=0)
     newbalanceDest: float = Field(ge=0)
 
@@ -31,8 +37,7 @@ class PredictIn(BaseModel):
 
 
 class Contribution(BaseModel):
-    """Aporte de una variable al score (escala log-odds para árboles y regresión
-    logística). Positivo empuja hacia alerta; no implica causalidad."""
+    """Cuánto sube o baja una variable el score (no es la causa del fraude)"""
 
     feature: str
     value: float | str
@@ -41,7 +46,7 @@ class Contribution(BaseModel):
 
 class Prediction(BaseModel):
     fraud_probability: float
-    # Alerta del modelo (score >= umbral), no un fraude confirmado
+    # Es una alerta del modelo, no un fraude confirmado
     is_fraud: bool
     risk_level: RiskLevel = "low"
     explanation: list[Contribution] | None = None

@@ -1,5 +1,4 @@
-"""Aportes por variable de una predicción (TreeSHAP de XGBoost o coeficientes de la
-regresión logística). Explican el score del modelo, no prueban un fraude."""
+"""Cuánto aporta cada variable al score de una predicción"""
 
 import logging
 from typing import Any
@@ -27,8 +26,7 @@ def _raw_contributions(estimator: Any, transformed: np.ndarray) -> np.ndarray | 
 
 
 def explain(model: Any, frame: pd.DataFrame) -> list[list[dict]] | None:
-    """Lista de aportes por fila, ordenados por magnitud; None si el modelo no los
-    soporta (p. ej. Random Forest)."""
+    """Aportes de cada fila; None si el modelo no lo permite"""
     if not hasattr(model, "steps") or len(model.steps) < 2:
         return None
     preprocess, estimator = model[:-1], model[-1]

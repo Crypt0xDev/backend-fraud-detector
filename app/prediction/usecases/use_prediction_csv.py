@@ -2,15 +2,16 @@ import io
 from typing import IO, Any
 
 import pandas as pd
-from pydantic import TypeAdapter
+from fastapi import HTTPException, status
+from fastapi.exceptions import RequestValidationError
+from pydantic import TypeAdapter, ValidationError
+from sqlalchemy.orm import Session
 
-from app.batch.batch_repository import BatchRepository
-from app.batch.usecases.use_batch_save import save_batch
 from app.prediction.prediction_policy import RiskPolicy
+from app.prediction.prediction_port import BatchArchive
 from app.prediction.prediction_schema import Prediction, PredictOut, Transaction
 from app.prediction.usecases.use_prediction_predict import predict_transactions
-from config.settings import settings
-from utils.storage import FileStorage
+from app.user.user_entity import User
 
 transactions_adapter = TypeAdapter(list[Transaction])
 
@@ -20,7 +21,7 @@ class InvalidCSVError(ValueError):
 
 
 def read_csv(file: IO[bytes], max_rows: int) -> tuple[pd.DataFrame, list[Transaction]]:
-    """Lee un CSV de PaySim; las columnas extra (p. ej. isFraud) se ignoran."""
+    """Lee un CSV de PaySim. Las columnas que sobran, como isFraud, no se usan"""
     try:
         frame = pd.read_csv(file, nrows=max_rows + 1)
     except (pd.errors.EmptyDataError, pd.errors.ParserError, UnicodeDecodeError) as e:
@@ -39,7 +40,7 @@ FORMULA_PREFIXES = ("=", "+", "-", "@", chr(9), chr(13))
 
 
 def escape_formula(value: Any) -> Any:
-    """Evita que Excel o Sheets ejecuten como fórmula un texto del CSV (inyección CSV)."""
+    """Evita que Excel o Sheets tomen un texto del CSV como fórmula"""
     if isinstance(value, str) and value.startswith(FORMULA_PREFIXES):
         return "'" + value
     return value
@@ -61,27 +62,37 @@ def predictions_csv(frame: pd.DataFrame, predictions: list[Prediction]) -> bytes
     )
 
 
-def predict_csv_file(
+def execute(
+    db: Session,
+    current_user: User,
     model: Any,
     policy: RiskPolicy,
     original: bytes,
     *,
     file_name: str,
-    username: str,
-    storage: FileStorage | None,
-    batches: BatchRepository | None,
+    max_rows: int,
+    archive: BatchArchive | None,
     model_version: str | None = None,
 ) -> PredictOut:
-    """Predice el CSV y, si hay Storage y base de datos, lo guarda en el historial."""
-    frame, transactions = read_csv(io.BytesIO(original), settings.max_batch_rows)
+    """Analiza el CSV y, si hay almacenamiento, lo guarda en el historial"""
+    try:
+        frame, transactions = read_csv(io.BytesIO(original), max_rows)
+    except InvalidCSVError as error:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(error)
+        ) from error
+    except ValidationError as error:
+        raise RequestValidationError(
+            error.errors(include_url=False, include_context=False)
+        ) from error
+
     result = predict_transactions(
         model, transactions, policy, model_version=model_version
     )
-    if storage is not None and batches is not None:
-        result.batch_id = save_batch(
-            storage,
-            batches,
-            username=username,
+    if archive is not None:
+        result.batch_id = archive.save(
+            db,
+            username=current_user.username,
             file_name=file_name,
             original=original,
             predictions=predictions_csv(frame, result.predictions),

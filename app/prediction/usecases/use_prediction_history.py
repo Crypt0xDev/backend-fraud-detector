@@ -1,42 +1,50 @@
-import logging
+from fastapi import HTTPException, status
+from sqlalchemy import func
+from sqlalchemy.orm import Session
 
-from app.prediction.prediction_repository import PredictionRepository
-from app.prediction.prediction_schema import (
-    PredictionHistoryOut,
-    PredictOut,
-    Transaction,
-)
-
-logger = logging.getLogger(__name__)
+from app.auth.auth_dependency import is_root
+from app.prediction.prediction_entity import PredictionRecord
+from app.prediction.prediction_schema import PredictionHistoryOut, PredictionRecordOut
+from app.user.user_entity import User
 
 
-def save_predictions(
-    predictions: PredictionRepository | None,
-    username: str,
-    transactions: list[Transaction],
-    result: PredictOut,
-) -> None:
-    """Guarda el análisis en el historial; si falla, la predicción se devuelve igual."""
-    if predictions is None:
-        return
-    try:
-        predictions.add_many(
-            username, transactions, result.predictions, result.threshold
-        )
-    except Exception:
-        logger.exception("No se pudo guardar el historial de predicciones")
-
-
-def prediction_history(
-    predictions: PredictionRepository,
-    owner: str | None,
+def execute(
+    db: Session,
+    current_user: User,
+    all: bool,
     limit: int,
     offset: int = 0,
     alerts_only: bool = False,
 ) -> PredictionHistoryOut:
-    total, flagged = predictions.totals(owner)
+    """Últimas transacciones analizadas; con `all` el root ve las de todos"""
+    if all and not is_root(current_user):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Solo un administrador puede ver las predicciones de todos",
+        )
+    owner = [] if all else [PredictionRecord.username == current_user.username]
+
+    total, flagged = (
+        db.query(
+            func.count(PredictionRecord.id),
+            func.count(PredictionRecord.id).filter(PredictionRecord.is_fraud),
+        )
+        .filter(*owner)
+        .one()
+    )
+    query = db.query(PredictionRecord).filter(*owner)
+    if alerts_only:
+        query = query.filter(PredictionRecord.is_fraud)
+    items = (
+        query.order_by(PredictionRecord.created_at.desc())
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
     return PredictionHistoryOut(
         total=total,
         flagged=flagged,
-        items=predictions.recent(owner, limit, offset, alerts_only),
+        items=[
+            PredictionRecordOut.model_validate(p, from_attributes=True) for p in items
+        ],
     )
