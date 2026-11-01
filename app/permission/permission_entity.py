@@ -1,9 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
-
 from sqlalchemy import DateTime, Integer, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
 from config.database import BaseModel
 from utils.helpers import utcnow
 
@@ -12,20 +10,13 @@ if TYPE_CHECKING:
 
 
 class Permission(BaseModel):
-    """Acciones: ver, crear, editar y eliminar"""
-
+    """Acciones: ver, crear, editar y eliminar."""
     __tablename__ = "permission"
-    __table_args__ = (
-        {"info": {"upgrades": ["ALTER TABLE permission ENABLE ROW LEVEL SECURITY"]}},
-    )
+    __table_args__ = ({"info": {"upgrades": ["ALTER TABLE permission ENABLE ROW LEVEL SECURITY"]}}, )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    name: Mapped[str] = mapped_column(Text, unique=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=utcnow, server_default=func.now()
-    )
+    name: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utcnow, server_default=func.now())
 
     # Relaciones
-    permission_modules: Mapped[list["ModulePermission"]] = relationship(
-        back_populates="permission"
-    )
+    permission_modules: Mapped[list["ModulePermission"]] = relationship(back_populates="permission")
