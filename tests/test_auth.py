@@ -1,5 +1,7 @@
 from conftest import ADMIN, ANALYST, login
 
+from config import database
+from config.create_default_records import run_all_seeders
 from utils.token import create_download_token
 
 
@@ -133,4 +135,21 @@ def test_tokens_sin_typ_de_versiones_anteriores_siguen_valiendo(client, admin):
         algorithm=ALGORITHM,
     )
     headers = {"Authorization": f"Bearer {old}"}
+    assert client.get("/api/v1/auth/me", headers=headers).status_code == 200
+
+
+def test_reiniciar_no_deshace_el_cambio_de_contrasena(client, analyst):
+    response = client.patch(
+        "/api/v1/users/me/change-password",
+        json={
+            "current_password": ANALYST[1],
+            "new_password": "nueva-pass-123",
+            "confirm_password": "nueva-pass-123",
+        },
+        headers=analyst,
+    )
+    assert response.status_code == 204
+    with database.SessionLocal() as db:
+        run_all_seeders(db)
+    headers = login(client, ANALYST[0], "nueva-pass-123")
     assert client.get("/api/v1/auth/me", headers=headers).status_code == 200

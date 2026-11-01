@@ -11,23 +11,24 @@ def module_permission_ids(client, admin, wanted: dict[str, set[str]]) -> list[in
     ]
 
 
+def create_role(client, admin, payload: dict) -> dict:
+    """Crea el rol (responde 201 sin cuerpo) y lo busca en la lista"""
+    response = client.post("/api/v1/roles", json=payload, headers=admin)
+    assert response.status_code == 201, response.text
+    assert response.content == b""
+    roles = client.get("/api/v1/roles", headers=admin).json()
+    return next(r for r in roles if r["name"] == payload["name"])
+
+
 def test_solo_el_root_gestiona_roles(client, analyst):
     assert client.get("/api/v1/roles", headers=analyst).status_code == 403
 
 
 def test_crear_listar_actualizar_y_borrar_rol(client, admin):
     ids = module_permission_ids(client, admin, {"lotes": {"ver"}})
-    response = client.post(
-        "/api/v1/roles",
-        json={
-            "name": "Lector",
-            "description": "Solo ve lotes",
-            "module_permission_ids": ids,
-        },
-        headers=admin,
+    role = create_role(
+        client, admin, {"name": "Lector", "description": "Solo ve lotes", "module_permission_ids": ids}
     )
-    assert response.status_code == 201
-    role = response.json()
     assert role["permissions"] == {"lotes": ["ver"]}
 
     roles = client.get("/api/v1/roles", headers=admin).json()
@@ -49,15 +50,20 @@ def test_crear_listar_actualizar_y_borrar_rol(client, admin):
     assert (
         client.delete(f"/api/v1/roles/{role['id']}", headers=admin).status_code == 204
     )
+    # Borrado lógico: no aparece, no se puede asignar y su nombre queda libre
     assert client.get(f"/api/v1/roles/{role['id']}", headers=admin).status_code == 404
+    assert "Lector" not in {r["name"] for r in client.get("/api/v1/roles", headers=admin).json()}
+    assert client.delete(f"/api/v1/roles/{role['id']}", headers=admin).status_code == 404
+    response = client.patch(f"/api/v1/users/{ANALYST[0]}", json={"role_ids": [role["id"]]}, headers=admin)
+    assert response.status_code == 400
+    again = create_role(client, admin, {"name": "Lector", "description": "otra vez"})
+    assert again["id"] != role["id"]
 
 
 def test_nombre_de_rol_repetido_da_409(client, admin):
     payload = {"name": "Analista", "description": "otra vez"}
     assert client.post("/api/v1/roles", json=payload, headers=admin).status_code == 409
-    other = client.post(
-        "/api/v1/roles", json={"name": "Otro", "description": "x" * 3}, headers=admin
-    ).json()
+    other = create_role(client, admin, {"name": "Otro", "description": "x" * 3})
     response = client.put(f"/api/v1/roles/{other['id']}", json=payload, headers=admin)
     assert response.status_code == 409
 
@@ -71,7 +77,7 @@ def test_permisos_inexistentes_dan_400(client, admin):
     assert response.status_code == 400
 
 
-def test_no_se_borra_un_rol_asignado(client, admin):
+def test_no_se_borra_un_rol_asignado_ni_el_analista(client, admin, analyst):
     analyst_role = next(
         r
         for r in client.get("/api/v1/roles", headers=admin).json()
@@ -80,18 +86,32 @@ def test_no_se_borra_un_rol_asignado(client, admin):
     response = client.delete(f"/api/v1/roles/{analyst_role['id']}", headers=admin)
     assert response.status_code == 409
 
+    role = create_role(client, admin, {"name": "Asignado", "description": "abc"})
+    response = client.patch(f"/api/v1/users/{ANALYST[0]}", json={"role_ids": [role["id"]]}, headers=admin)
+    assert response.status_code == 200
+    response = client.delete(f"/api/v1/roles/{role['id']}", headers=admin)
+    assert response.status_code == 409
+
+
+def test_se_borra_un_rol_que_solo_tenia_un_usuario_eliminado(client, admin):
+    role = create_role(client, admin, {"name": "Temporal", "description": "abc"})
+    response = client.post(
+        "/api/v1/users",
+        json={"username": "ex", "password": "ex-pass-123", "role_ids": [role["id"]]},
+        headers=admin,
+    )
+    assert response.status_code == 201
+    assert client.delete(f"/api/v1/roles/{role['id']}", headers=admin).status_code == 409
+
+    assert client.delete("/api/v1/users/ex", headers=admin).status_code == 204
+    assert client.delete(f"/api/v1/roles/{role['id']}", headers=admin).status_code == 204
+
 
 def test_los_permisos_del_rol_se_aplican_en_cada_peticion(client, admin, analyst):
     ids = module_permission_ids(client, admin, {"lotes": {"ver"}})
-    role = client.post(
-        "/api/v1/roles",
-        json={
-            "name": "Lector",
-            "description": "Solo ve lotes",
-            "module_permission_ids": ids,
-        },
-        headers=admin,
-    ).json()
+    role = create_role(
+        client, admin, {"name": "Lector", "description": "Solo ve lotes", "module_permission_ids": ids}
+    )
     response = client.patch(
         f"/api/v1/users/{ANALYST[0]}", json={"role_ids": [role["id"]]}, headers=admin
     )
@@ -132,15 +152,9 @@ def test_listar_roles_y_usuarios_no_hace_una_consulta_por_fila(client, admin, en
 
     before = count_queries(engine, list_all)
     for i in range(5):
-        role = client.post(
-            "/api/v1/roles",
-            json={
-                "name": f"Rol {i}",
-                "description": "abc",
-                "module_permission_ids": ids,
-            },
-            headers=admin,
-        ).json()
+        role = create_role(
+            client, admin, {"name": f"Rol {i}", "description": "abc", "module_permission_ids": ids}
+        )
         client.post(
             "/api/v1/users",
             json={
@@ -151,3 +165,18 @@ def test_listar_roles_y_usuarios_no_hace_una_consulta_por_fila(client, admin, en
             headers=admin,
         )
     assert count_queries(engine, list_all) == before
+
+
+def test_el_analista_no_se_puede_renombrar(client, admin):
+    analyst_role = next(
+        r
+        for r in client.get("/api/v1/roles", headers=admin).json()
+        if r["name"] == "Analista"
+    )
+    payload = {"name": "Analista 2", "description": "otro nombre"}
+    response = client.put(f"/api/v1/roles/{analyst_role['id']}", json=payload, headers=admin)
+    assert response.status_code == 409
+    # Sus permisos y su descripción sí se pueden cambiar
+    payload = {"name": "Analista", "description": "nueva descripción"}
+    response = client.put(f"/api/v1/roles/{analyst_role['id']}", json=payload, headers=admin)
+    assert response.status_code == 200

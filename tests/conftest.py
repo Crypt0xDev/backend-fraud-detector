@@ -1,14 +1,9 @@
-"""Pruebas contra la app real: base de datos aislada, disco temporal y el modelo real.
-
-Por defecto usa SQLite en memoria. Con TEST_DATABASE_URL usa esa base de PostgreSQL:
-se BORRAN todas sus tablas en cada prueba, así que nunca apuntes a una base real.
-"""
-
+import json
 import os
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, event
+from sqlalchemy import create_engine, event, text
 from sqlalchemy.orm import sessionmaker
 
 import main
@@ -18,6 +13,11 @@ from utils.rate_limit import limiter
 
 ADMIN = ("admin", "admin-pass-123")
 ANALYST = ("analyst", "analyst-pass-123")
+
+# Siempre hay un solo modelo: se toma la versión del que está en la carpeta
+MODEL_VERSION = json.loads(
+    (settings.artifacts_dir / "metrics.json").read_text(encoding="utf-8")
+)["version"]
 
 TRANSACTION = {
     "step": 1,
@@ -37,7 +37,6 @@ CSV_HEADER = (
 )
 CSV_ROW = "1,TRANSFER,181.0,C1305486145,181.0,0.0,C553264065,0.0,0.0,1"
 
-
 def sqlite_engine(path):
     # En archivo y no en memoria: al apagarse, la app hace engine.dispose()
     engine = create_engine(
@@ -51,7 +50,6 @@ def sqlite_engine(path):
 
     return engine
 
-
 @pytest.fixture(scope="session")
 def engine(tmp_path_factory):
     url = os.environ.get("TEST_DATABASE_URL")
@@ -62,7 +60,6 @@ def engine(tmp_path_factory):
     yield engine
     engine.dispose()
 
-
 @pytest.fixture
 def is_postgres(engine) -> bool:
     return engine.dialect.name == "postgresql"
@@ -71,6 +68,9 @@ def is_postgres(engine) -> bool:
 @pytest.fixture
 def client(engine, monkeypatch, tmp_path):
     database.BaseModel.metadata.drop_all(engine)
+    # Si no, los upgrades se saltarían en las tablas recién creadas
+    with engine.begin() as conn:
+        conn.execute(text(f"DROP TABLE IF EXISTS {database.UPGRADES_TABLE}"))
     monkeypatch.setattr(database, "engine", engine)
     monkeypatch.setattr(
         database,
@@ -83,13 +83,19 @@ def client(engine, monkeypatch, tmp_path):
         "storage_dir": tmp_path,
         "admin_username": ADMIN[0],
         "admin_password": ADMIN[1],
-        "user_username": ANALYST[0],
-        "user_password": ANALYST[1],
         "rate_limit_per_minute": 120,
     }.items():
         monkeypatch.setattr(settings, name, value)
     limiter.hits.clear()
     with TestClient(main.app) as test_client:
+        # Solo se siembra el admin: el analista lo crea él, como en producción
+        response = test_client.post(
+            "/api/v1/users",
+            json={"username": ANALYST[0], "password": ANALYST[1]},
+            headers=login(test_client, *ADMIN),
+        )
+        assert response.status_code == 201, response.text
+        limiter.hits.clear()
         yield test_client
     limiter.hits.clear()
 
@@ -101,16 +107,13 @@ def login(client: TestClient, username: str, password: str) -> dict[str, str]:
     assert response.status_code == 200, response.text
     return {"Authorization": f"Bearer {response.json()['access_token']}"}
 
-
 @pytest.fixture
 def admin(client) -> dict[str, str]:
     return login(client, *ADMIN)
 
-
 @pytest.fixture
 def analyst(client) -> dict[str, str]:
     return login(client, *ANALYST)
-
 
 @pytest.fixture
 def make_user(client, admin):

@@ -7,7 +7,7 @@ from app.user.usecases.use_user_roles import ensure_not_last_root
 from app.user.user_entity import User
 from app.user.user_schema import ACTIVE
 from config import database
-from utils.errors import ConflictError
+from fastapi import HTTPException
 from utils.password import hash_password
 
 
@@ -28,7 +28,8 @@ def test_crear_usuario_con_rol_por_defecto(client, admin):
         headers=admin,
     )
     assert response.status_code == 201
-    body = response.json()
+    assert response.content == b""
+    body = client.get("/api/v1/users/nuevo", headers=admin).json()
     assert body["root"] is False
     assert [role["name"] for role in body["roles"]] == ["Analista"]
     assert "password_hash" not in body
@@ -36,6 +37,10 @@ def test_crear_usuario_con_rol_por_defecto(client, admin):
 
 def test_crear_usuario_repetido_da_409(client, admin):
     payload = {"username": ANALYST[0], "password": "password-123"}
+    response = client.post("/api/v1/users", json=payload, headers=admin)
+    assert response.status_code == 409
+    # Admin y admin serían el mismo usuario a la vista
+    payload["username"] = ANALYST[0].upper()
     response = client.post("/api/v1/users", json=payload, headers=admin)
     assert response.status_code == 409
 
@@ -108,11 +113,15 @@ def test_actualizar_usuario(client, admin, analyst):
 def test_listar_y_ver_usuarios(client, admin):
     response = client.get("/api/v1/users", headers=admin)
     assert response.status_code == 200
-    assert {u["username"] for u in response.json()} == {ADMIN[0], ANALYST[0]}
+    body = response.json()
+    assert {u["username"] for u in body["items"]} == {ADMIN[0], ANALYST[0]}
+    assert body["total"] == 2
+    second = client.get("/api/v1/users?page=2&page_size=1", headers=admin).json()
+    assert len(second["items"]) == 1 and second["total"] == 2
     assert client.get("/api/v1/users/nadie", headers=admin).status_code == 404
 
 
-def test_borrar_usuario_borra_sus_lotes_y_archivos(client, admin, analyst, tmp_path):
+def test_borrar_usuario_es_logico_y_guarda_sus_lotes(client, admin, analyst, tmp_path):
     from conftest import CSV_HEADER, CSV_ROW
 
     csv = f"{CSV_HEADER}\n{CSV_ROW}\n".encode()
@@ -129,9 +138,22 @@ def test_borrar_usuario_borra_sus_lotes_y_archivos(client, admin, analyst, tmp_p
     assert (
         client.delete(f"/api/v1/users/{ANALYST[0]}", headers=admin).status_code == 204
     )
-    assert not batch_dir.exists()
+    # Sus lotes y archivos se quedan guardados
+    assert batch_dir.is_dir()
     listed = client.get("/api/v1/batches?all=true", headers=admin).json()
-    assert listed["total"] == 0
+    assert listed["total"] == 1
+
+    # Ya no entra, no aparece y su nombre no se puede volver a usar
+    assert client.get("/api/v1/auth/me", headers=analyst).status_code == 401
+    response = client.post("/api/v1/auth/login", data={"username": ANALYST[0], "password": ANALYST[1]})
+    assert response.status_code == 401
+    assert client.get(f"/api/v1/users/{ANALYST[0]}", headers=admin).status_code == 404
+    usernames = {u["username"] for u in client.get("/api/v1/users", headers=admin).json()["items"]}
+    assert ANALYST[0] not in usernames
+    assert client.delete(f"/api/v1/users/{ANALYST[0]}", headers=admin).status_code == 404
+    assert client.patch(f"/api/v1/users/{ANALYST[0]}/enable", headers=admin).status_code == 404
+    payload = {"username": ANALYST[0], "password": "password-123"}
+    assert client.post("/api/v1/users", json=payload, headers=admin).status_code == 409
 
 
 def test_ultimo_root_con_peticiones_simultaneas(client, is_postgres):
@@ -162,9 +184,9 @@ def test_ultimo_root_con_peticiones_simultaneas(client, is_postgres):
             assert other is not None
             try:
                 ensure_not_last_root(second, other)
-                other.state = "Inactivo"
+                other.state = "Deshabilitado"
                 second.commit()
-            except ConflictError:
+            except HTTPException:
                 second.rollback()
                 errors.append(409)
 
@@ -173,7 +195,7 @@ def test_ultimo_root_con_peticiones_simultaneas(client, is_postgres):
         thread.join(timeout=0.5)
         assert thread.is_alive(), "la segunda transacción debía esperar el bloqueo"
 
-        target.state = "Inactivo"
+        target.state = "Deshabilitado"
         first.commit()
         thread.join(timeout=5)
     finally:

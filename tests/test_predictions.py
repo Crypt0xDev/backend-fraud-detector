@@ -1,7 +1,7 @@
 import csv
 import io
 
-from conftest import ANALYST, CSV_HEADER, CSV_ROW, TRANSACTION
+from conftest import ANALYST, CSV_HEADER, CSV_ROW, MODEL_VERSION, TRANSACTION
 
 from config.settings import settings
 
@@ -36,13 +36,20 @@ def test_predecir_devuelve_score_y_guarda_historial(client, analyst):
     assert 0 <= prediction["fraud_probability"] <= 1
     assert prediction["risk_level"] in ("low", "medium", "high")
     assert prediction["explanation"]
-    assert body["model_version"] == "v001"
+    assert body["model_version"] == MODEL_VERSION
     assert body["threshold"] == body["risk_levels"]["high"]
 
     history = client.get("/api/v1/predictions", headers=analyst).json()
     assert history["total"] == 1
     assert history["items"][0]["username"] == ANALYST[0]
     assert history["items"][0]["name_orig"] == TRANSACTION["nameOrig"]
+    assert history["items"][0]["model_version"] == MODEL_VERSION
+
+
+def test_historial_paginado(client, analyst):
+    predict(client, analyst, [TRANSACTION] * 3)
+    page = client.get("/api/v1/predictions?page=2&page_size=2", headers=analyst).json()
+    assert page["total"] == 3 and page["page"] == 2 and len(page["items"]) == 1
 
 
 def test_historial_es_de_cada_usuario(client, admin, analyst, make_user):
@@ -133,6 +140,7 @@ def test_csv_crea_un_lote_con_sus_archivos(client, analyst):
     page = client.get("/api/v1/batches", headers=analyst).json()
     assert page["total"] == 1
     assert page["items"][0]["total_rows"] == 2
+    assert page["items"][0]["model_version"] == MODEL_VERSION
 
 
 def test_csv_escapa_formulas_en_el_resultado(client, analyst):
@@ -190,3 +198,9 @@ def test_el_413_lleva_cabeceras_cors(client):
     )
     assert response.status_code == 413
     assert response.headers["access-control-allow-origin"] == origin
+
+
+def test_predecir_limita_las_transacciones_por_peticion(client, analyst):
+    many = [TRANSACTION] * (settings.max_predict_rows + 1)
+    assert predict(client, analyst, many).status_code == 422
+    assert predict(client, analyst, many[:-1]).status_code == 200
