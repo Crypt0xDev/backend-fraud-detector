@@ -58,18 +58,20 @@ jobs:
           sed -i 's/^pydantic==.*/pydantic==2.12.5/' requirements.txt
           # El SDK Gradio ejecuta space.py: sirve la API en el puerto 7860
           cat > space.py <<'EOF'
-          import os
-
-          # Qué variables llegan al Space (solo el largo, nunca el valor)
-          for name in ("API_PUBLIC_URL", "CORS_ORIGINS", "STORAGE_BACKEND", "DATABASE_URL", "JWT_SECRET",
-                       "ADMIN_USERNAME", "ADMIN_PASSWORD", "SUPABASE_URL", "SUPABASE_SECRET_KEY"):
-              print(f"{name}: {len(os.environ[name]) if name in os.environ else 'no definida'}", flush=True)
+          import spaces  # ZeroGPU exige importarlo antes que el resto
 
           import uvicorn
 
           from main import app
 
+          @spaces.GPU
+          def gpu_check():
+              """ZeroGPU exige al menos una función con GPU; la API no la usa"""
+
           if __name__ == "__main__":
+              # Sin demo.launch() de Gradio, el aviso de arranque a ZeroGPU se manda a mano
+              if spaces.config.Config.zero_gpu:
+                  spaces.zero.startup()
               uvicorn.run(
                   app,
                   host="0.0.0.0",
