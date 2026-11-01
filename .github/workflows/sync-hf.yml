@@ -50,9 +50,26 @@ jobs:
           TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/fraud_test
         run: pytest -q
 
-      - name: Preparar el README para Hugging Face
+      - name: Preparar el Space (README, dependencias y entrada)
         run: |
           cat .github/hf-space.md README.md > README.hf && mv README.hf README.md
+          sed -i 's/^xgboost==/xgboost-cpu==/' requirements.txt
+          # El SDK Gradio ejecuta space.py: sirve la API en el puerto 7860
+          cat > space.py <<'EOF'
+          import uvicorn
+
+          from main import app
+
+          if __name__ == "__main__":
+              uvicorn.run(
+                  app,
+                  host="0.0.0.0",
+                  port=7860,
+                  proxy_headers=True,
+                  forwarded_allow_ips="127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,fc00::/7",
+              )
+          EOF
+          git add space.py
           git -c user.name=github-actions -c user.email=actions@github.com \
             commit -am "Configuración del Space"
 

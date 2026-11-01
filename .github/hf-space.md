@@ -3,10 +3,11 @@ title: Fraud Detector API
 emoji: 🛡️
 colorFrom: indigo
 colorTo: gray
-sdk: docker
-app_port: 8000
+sdk: gradio
+sdk_version: "6.15.2"
+python_version: "3.13"
+app_file: space.py
 pinned: false
 license: mit
 short_description: Detección de fraude en transacciones con XGBoost
 ---
-
