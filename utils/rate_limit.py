@@ -4,7 +4,6 @@ from collections import defaultdict, deque
 
 WINDOW_SECONDS = 60.0
 
-
 class RateLimiter:
     """Límite de peticiones por minuto de cada usuario (en memoria)"""
 
@@ -38,6 +37,5 @@ class RateLimiter:
         for key in expired:
             del self.hits[key]
         self.last_sweep = now
-
 
 limiter = RateLimiter()

@@ -14,10 +14,8 @@ TIMEOUT_SECONDS = 30
 
 StorageBackend = Literal["local", "supabase"]
 
-
 class StorageError(RuntimeError):
     pass
-
 
 class FileStorage(Protocol):
     """Lo que se puede hacer con el almacenamiento, sea Supabase o el disco"""
@@ -27,7 +25,6 @@ class FileStorage(Protocol):
     def signed_url(self, path: str, expires_in: int, download_name: str) -> str: ...
 
     def delete(self, paths: list[str]) -> None: ...
-
 
 class SupabaseStorage:
     """Guarda los archivos en un bucket privado de Supabase Storage"""
@@ -99,7 +96,6 @@ class SupabaseStorage:
     def delete(self, paths: list[str]) -> None:
         self._request("DELETE", f"/object/{self.bucket}", {"prefixes": paths})
 
-
 class LocalStorage:
     """Guarda los archivos en el disco"""
 
@@ -148,7 +144,6 @@ class LocalStorage:
             raise StorageError(
                 f"No se pudieron borrar los archivos: {error}"
             ) from error
-
 
 def open_storage(
     backend: StorageBackend | None,

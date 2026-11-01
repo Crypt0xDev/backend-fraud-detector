@@ -8,11 +8,9 @@ import pandas as pd
 
 logger = logging.getLogger(__name__)
 
-
 def _original_name(name: str) -> str:
     column = name.split("__", 1)[-1]
     return "type" if column.startswith("type_") else column
-
 
 def _raw_contributions(estimator: Any, transformed: np.ndarray) -> np.ndarray | None:
     if hasattr(estimator, "get_booster"):
@@ -23,7 +21,6 @@ def _raw_contributions(estimator: Any, transformed: np.ndarray) -> np.ndarray | 
     if hasattr(estimator, "coef_"):
         return transformed * estimator.coef_[0]
     return None
-
 
 def explain(model: Any, frame: pd.DataFrame) -> list[list[dict]] | None:
     """Aportes de cada fila; None si el modelo no lo permite"""

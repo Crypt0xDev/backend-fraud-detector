@@ -4,7 +4,6 @@ from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 TOO_LARGE = "La petición supera el tamaño máximo permitido"
 
-
 class BodySizeLimit:
     """Corta las peticiones con un cuerpo mayor que max_bytes.
     FastAPI lee el cuerpo antes de revisar la sesión, así que sin esto cualquiera

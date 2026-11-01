@@ -12,14 +12,12 @@ logger = logging.getLogger(__name__)
 ALGORITHM = "HS256"
 ACCESS_TOKEN_TYPE = "access"
 
-
 @cache
 def jwt_secret() -> str:
     if settings.jwt_secret:
         return settings.jwt_secret
     logger.warning("JWT_SECRET no está definido: las sesiones se pierden al reiniciar")
     return secrets.token_urlsafe(32)
-
 
 def create_token(username: str, version: int) -> tuple[str, int]:
     expires_in = settings.jwt_expire_minutes * 60
@@ -30,7 +28,6 @@ def create_token(username: str, version: int) -> tuple[str, int]:
         "exp": datetime.now(UTC) + timedelta(seconds=expires_in),
     }
     return jwt.encode(payload, jwt_secret(), algorithm=ALGORITHM), expires_in
-
 
 def decode_token(token: str) -> tuple[str, int] | None:
     """Devuelve (usuario, versión) si el token de sesión es válido"""
@@ -48,9 +45,7 @@ def decode_token(token: str) -> tuple[str, int] | None:
         return None
     return subject, version
 
-
 DOWNLOAD_TOKEN_TYPE = "download"
-
 
 def create_download_token(path: str, download_name: str, expires_in: int) -> str:
     """Token para descargar un archivo del disco. No sirve para iniciar sesión"""
@@ -61,7 +56,6 @@ def create_download_token(path: str, download_name: str, expires_in: int) -> str
         "exp": datetime.now(UTC) + timedelta(seconds=expires_in),
     }
     return jwt.encode(payload, jwt_secret(), algorithm=ALGORITHM)
-
 
 def decode_download_token(token: str) -> tuple[str, str] | None:
     """Devuelve (ruta, nombre) si el token de descarga es válido y no venció"""

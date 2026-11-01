@@ -10,10 +10,8 @@ from pydantic import BaseModel, ValidationError
 
 logger = logging.getLogger(__name__)
 
-
 def file_sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
-
 
 def load_model(
     path: Path,
@@ -64,7 +62,6 @@ def limit_threads(model: Any, threads: int) -> None:
     if params:
         model.set_params(**params)
 
-
 def load_metrics[T: BaseModel](path: Path, schema: type[T]) -> T | None:
     if not path.exists():
         logger.warning("No se encontraron las métricas en %s", path)
@@ -79,7 +76,6 @@ def load_metrics[T: BaseModel](path: Path, schema: type[T]) -> T | None:
     except ValidationError as error:
         logger.error("Las métricas en %s no son válidas: %s", path, error)
         return None
-
 
 def load_json(path: Path) -> Any | None:
     if not path.exists():
