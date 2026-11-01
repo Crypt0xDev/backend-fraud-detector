@@ -1,19 +1,23 @@
 <div align="center">
 
-# 🛡️ Backend Fraud Detector
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:4F46E5,100:0EA5E9&height=200&section=header&text=Fraud%20Detector%20API&fontSize=48&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Detecci%C3%B3n%20de%20fraude%20con%20Machine%20Learning&descAlignY=58&descSize=18" alt="Fraud Detector API" width="100%"/>
 
-**API REST que detecta transacciones financieras sospechosas con Machine Learning**
+<a href="https://huggingface.co/spaces/Crypt0xDev/backend-fraud-detector">
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=20&duration=3000&pause=800&color=4F46E5&center=true&vCenter=true&width=600&lines=%F0%9F%9B%A1%EF%B8%8F+Detecta+transacciones+sospechosas;%E2%9A%A1+Predicciones+en+tiempo+real;%F0%9F%93%84+Analiza+CSV+de+hasta+10.000+filas;%F0%9F%A7%A0+Explica+cada+decisi%C3%B3n+del+modelo" alt="Typing SVG"/>
+</a>
 
-[![Python](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.143-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![XGBoost](https://img.shields.io/badge/XGBoost-3.4-EB5E28)](https://xgboost.readthedocs.io/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supabase-4169E1?logo=postgresql&logoColor=white)](https://supabase.com/)
-[![Docker](https://img.shields.io/badge/Docker-listo-2496ED?logo=docker&logoColor=white)](#-docker)
-[![License: MIT](https://img.shields.io/badge/Licencia-MIT-yellow.svg)](#-licencia)
+<br/>
 
-[![Demo en Hugging Face](https://img.shields.io/badge/🤗%20Demo-Hugging%20Face-FFD21E)](https://huggingface.co/spaces/Crypt0xDev/backend-fraud-detector)
+[![Python](https://img.shields.io/badge/Python-3.14-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.143-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![XGBoost](https://img.shields.io/badge/XGBoost-3.4-EB5E28?style=for-the-badge)](https://xgboost.readthedocs.io/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supabase-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://supabase.com/)
+[![Docker](https://img.shields.io/badge/Docker-listo-2496ED?style=for-the-badge&logo=docker&logoColor=white)](#-docker)
+[![License: MIT](https://img.shields.io/badge/Licencia-MIT-F59E0B?style=for-the-badge)](#-licencia)
 
-[Demo](https://huggingface.co/spaces/Crypt0xDev/backend-fraud-detector) · [Entrenamiento del modelo](https://github.com/Crypt0xDev/ml-fraud-training) · [Frontend](https://github.com/Crypt0xDev/frontend-fraud-detector)
+<a href="https://huggingface.co/spaces/Crypt0xDev/backend-fraud-detector"><img src="https://img.shields.io/badge/🤗_Demo-Hugging_Face-FFD21E?style=flat-square" alt="Demo"/></a>
+<a href="https://github.com/Crypt0xDev/ml-fraud-training"><img src="https://img.shields.io/badge/🧠_Entrenamiento-del_modelo-8B5CF6?style=flat-square" alt="Entrenamiento"/></a>
+<a href="https://github.com/Crypt0xDev/frontend-fraud-detector"><img src="https://img.shields.io/badge/💻_Frontend-Next.js-000000?style=flat-square" alt="Frontend"/></a>
 
 </div>
 
@@ -21,267 +25,103 @@
 
 ## 📖 Sobre el proyecto
 
-Sistema inteligente en Python que analiza transacciones financieras y detecta posibles fraudes con un modelo **XGBoost** entrenado con el dataset [PaySim](https://www.kaggle.com/datasets/ealaxi/paysim1/data) (6,3 millones de transacciones).
+Analiza transacciones financieras y detecta posibles fraudes con un modelo **XGBoost** entrenado con el dataset [PaySim](https://www.kaggle.com/datasets/ealaxi/paysim1/data) (**6,3 millones** de transacciones).
 
-Permite analizar transacciones sueltas o un CSV completo, explica por qué el modelo marcó una alerta, guarda el historial y controla el acceso con usuarios, roles y permisos.
-
-> 🚀 La versión desplegada está en **[Hugging Face](https://huggingface.co/spaces/Crypt0xDev/backend-fraud-detector)**. Este repositorio tiene el código fuente.
-
-## 📑 Contenido
-
-- [Características](#-características)
-- [Arquitectura](#-arquitectura)
-- [Tecnologías](#-tecnologías)
-- [Inicio rápido](#-inicio-rápido)
-- [Variables de entorno](#-variables-de-entorno)
-- [Estructura del proyecto](#-estructura-del-proyecto)
-- [Roles y permisos](#-roles-y-permisos)
-- [Scripts](#-scripts)
-- [Docker](#-docker)
-- [Proyectos relacionados](#-proyectos-relacionados)
-- [Licencia](#-licencia)
-
-## ✨ Características
-
-| | |
-|---|---|
-| 🔍 **Detección de fraude** | Probabilidad de fraude y nivel de riesgo (bajo, medio, alto) por transacción |
-| 💡 **Explicación** | Qué variables subieron o bajaron el score de cada predicción |
-| 📄 **Análisis de CSV** | Sube un CSV de PaySim de hasta 10.000 filas y descarga los resultados |
-| 🗂️ **Historial** | Lotes y predicciones guardados por usuario, con estadísticas por día |
-| 🔐 **Roles y permisos** | Usuario root y roles con permisos por módulo |
-| 📊 **Métricas del modelo** | Métricas, experimentos y perfil del dataset para el dashboard |
-| 🛡️ **Seguridad** | JWT, contraseñas con scrypt, límite de peticiones y de intentos de login |
-
-## 🏗️ Arquitectura
+<table>
+  <tr>
+    <td align="center" width="25%">🔍<br/><b>Predicción</b><br/><sub>Probabilidad y nivel de riesgo, con las variables que influyeron</sub></td>
+    <td align="center" width="25%">📄<br/><b>Lotes CSV</b><br/><sub>Hasta 10.000 filas, con descarga de resultados</sub></td>
+    <td align="center" width="25%">🗂️<br/><b>Historial</b><br/><sub>Lotes y predicciones por usuario</sub></td>
+    <td align="center" width="25%">🔐<br/><b>Seguridad</b><br/><sub>Roles y permisos, JWT y contraseñas con scrypt</sub></td>
+  </tr>
+</table>
 
 ```mermaid
 flowchart LR
-    F[Frontend<br/>Next.js] -->|HTTP + JWT| A[FastAPI<br/>/api/v1]
-    A --> M[Modelo XGBoost<br/>ml/artifacts]
-    A --> D[(PostgreSQL<br/>Supabase)]
-    A --> S[(Almacenamiento CSV<br/>Supabase Storage o disco)]
-    T[ml-fraud-training] -.->|pipeline.joblib<br/>metrics.json| M
+    F[💻 Frontend<br/>Next.js] -->|HTTP + JWT| A[⚡ FastAPI<br/>/api/v1]
+    A --> M[🧠 Modelo XGBoost<br/>ml/artifacts]
+    A --> D[(🐘 PostgreSQL<br/>Supabase)]
+    A --> S[(📦 CSV<br/>Supabase Storage o disco)]
 ```
-
-Cada módulo de `app/` tiene sus propias rutas, esquemas, entidades y casos de uso, así que se puede cambiar uno sin tocar los demás.
 
 ## 🧰 Tecnologías
 
-| Área | Herramientas |
-|---|---|
-| API | FastAPI 0.143, Uvicorn, Pydantic 2 + pydantic-settings |
-| Machine Learning | XGBoost 3.4, scikit-learn 1.9, pandas 3, NumPy |
-| Base de datos | PostgreSQL (local o Supabase), SQLAlchemy 2.1, psycopg 3 |
-| Seguridad | PyJWT (tokens), scrypt (contraseñas) |
-| Herramientas | uv, ruff, Docker |
+<div align="center">
+
+<img src="https://skillicons.dev/icons?i=python,fastapi,sklearn,postgres,supabase,docker,githubactions&theme=dark" alt="Tecnologías"/>
+
+</div>
 
 ## 🚀 Inicio rápido
 
-### Requisitos
-
-- [uv](https://docs.astral.sh/uv/) (instala Python 3.14 automáticamente)
-- PostgreSQL: local o Supabase. Sin `DATABASE_URL` no hay login ni historial
-- Artefactos del modelo en `ml/artifacts/`. Sin `pipeline.joblib`, `/predict` responde 503
-
-### 1. Instalar uv
-
-<details>
-<summary><b>macOS / Linux</b></summary>
-
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-</details>
-
-<details>
-<summary><b>Windows (PowerShell)</b></summary>
-
-```powershell
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-```
-
-</details>
-
-Cierra y abre la terminal después de instalar.
-
-### 2. Instalar y ejecutar
-
-<details open>
-<summary><b>macOS / Linux</b></summary>
-
-```bash
-git clone https://github.com/Crypt0xDev/backend-fraud-detector.git
-cd backend-fraud-detector
-uv venv --python 3.14 .venv
-uv pip install --python .venv -r requirements-dev.txt
-cp .env.example .env
-uv run uvicorn main:app --reload
-```
-
-</details>
-
-<details>
-<summary><b>Windows (cmd)</b></summary>
+> Necesitas [Python 3.14](https://www.python.org/downloads/), [Git LFS](https://git-lfs.com/) y una base PostgreSQL (local o Supabase).
 
 ```cmd
+git lfs install
 git clone https://github.com/Crypt0xDev/backend-fraud-detector.git
 cd backend-fraud-detector
-uv venv --python 3.14 .venv
-uv pip install --python .venv -r requirements-dev.txt
+python -m venv .venv
+.venv\Scripts\activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
 copy .env.example .env
-uv run uvicorn main:app --reload
+uvicorn main:app --reload --reload-include "*.joblib" --reload-include "*.json"
 ```
 
-</details>
+Completa `DATABASE_URL` y `JWT_SECRET` en `.env` antes de arrancar. En macOS / Linux activa con `source .venv/bin/activate` y copia con `cp`.
 
-> [!NOTE]
-> Copia `.env.example` solo la primera vez; si lo repites sobrescribe tu `.env`.
->
-> `requirements-dev.txt` instala la API más ruff y pytest. En el servidor solo hace falta `requirements.txt`.
+<div align="center">
 
-### 3. Activar y desactivar el entorno virtual (opcional)
+📚 **Documentación de la API:** http://localhost:8000/docs
 
-`uv run` ya usa `.venv` sin activarlo. Actívalo solo si quieres usar `python` o `uvicorn` directamente.
-
-| Sistema | Activar | Desactivar |
-|---|---|---|
-| macOS / Linux | `source .venv/bin/activate` | `deactivate` |
-| Windows (cmd) | `.venv\Scripts\activate.bat` | `deactivate` |
-| Windows (PowerShell) | `.venv\Scripts\Activate.ps1` | `deactivate` |
-
-Con el entorno activado, la API se inicia con `uvicorn main:app --reload`.
-
-> [!TIP]
-> Si PowerShell bloquea el script, ejecuta una vez `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
-
-### 4. Abrir
-
-| | URL |
-|---|---|
-| API | http://localhost:8000/api/v1 |
-| Documentación (Swagger) | http://localhost:8000/docs |
+</div>
 
 ## ⚙️ Variables de entorno
 
-Todas están en [`.env.example`](.env.example).
+Todas están en [`.env.example`](.env.example). Las principales:
 
-- Generar el valor de `JWT_SECRET` (también sirve para `ADMIN_PASSWORD` y `USER_PASSWORD`):
-
-```bash
-uv run python -c "import secrets; print(secrets.token_urlsafe(32))"
-```
-
-- Calcular `MODEL_SHA256` (opcional; la API no carga el modelo si fue modificado):
-
-```bash
-uv run python -c "import hashlib; print(hashlib.sha256(open('ml/artifacts/pipeline.joblib','rb').read()).hexdigest())"
-```
-
-- Copiar de Supabase:
-  - `DATABASE_URL`: Connect → Transaction pooler
-  - `SUPABASE_URL` y `SUPABASE_SECRET_KEY`: Project Settings → API Keys
+| Variable | Para qué sirve |
+| --- | --- |
+| `DATABASE_URL` | Sin ella no hay login ni historial. En Supabase: Connect → Transaction pooler |
+| `JWT_SECRET` | Secreto usado para firmar los tokens JWT. |
+| `SUPABASE_URL` · `SUPABASE_SECRET_KEY` | Project Settings → API Keys |
+| `MAX_PREDICT_ROWS` | Límite de transacciones por petición (100 por defecto); los CSV usan su propio límite. |
+| `ADMIN_USERNAME` · `ADMIN_PASSWORD` | Admin inicial, solo si no hay ningún root; los demás usuarios se crean desde la API. |
+| `TRUSTED_PROXIES` | IPs del frontend (por defecto `127.0.0.1,::1`). Solo a ellas se les cree `X-Forwarded-For` para limitar los intentos de login por IP real; en Docker, pon la IP del contenedor del frontend. |
+| `DOCS_ENABLED` | `true` por defecto. Con `false` se apagan `/docs`, `/redoc` y `/openapi.json`; conviene en producción. |
 
 > [!IMPORTANT]
 > Nunca subas tu `.env` al repositorio: tiene contraseñas y claves.
 
-## 📁 Estructura del proyecto
+## 📁 Estructura
 
 ```text
-backend-fraud-detector/
-├── main.py                  # Punto de entrada: base, modelo y rutas
-├── requirements.txt         # Dependencias de la API
-├── requirements-dev.txt     # Las de la API más ruff y pytest
-├── app/                     # Un módulo por carpeta (rutas, esquemas, entidades, usecases/)
-│   ├── auth/                # Login, sesión (/auth/me) y control de permisos
-│   ├── user/                # Usuarios (solo el root los gestiona)
-│   ├── role/                # Roles con sus permisos
-│   ├── module/              # Secciones del menú (se usan desde role/)
-│   ├── permission/          # Acciones: ver, crear, editar, eliminar
-│   ├── prediction/          # Análisis de transacciones y CSV, e historial
-│   ├── batch/               # Lotes, descargas y estadísticas
-│   ├── model/               # Estado, métricas y experimentos del modelo
-│   └── visualization/       # Perfil del dataset y muestra para gráficos
-├── config/
-│   ├── settings.py          # Variables de entorno
-│   ├── database.py          # Conexión a PostgreSQL
-│   ├── routes.py            # Registro central de rutas
-│   ├── error_handlers.py    # Convierte los errores de los casos de uso en respuestas HTTP
-│   ├── entities.py          # Importa todas las entidades
-│   ├── create_default_records.py  # Ejecuta los seeders al iniciar
-│   └── seeders/             # Datos iniciales
-├── utils/                   # Tokens, contraseñas, errores, límites, archivos y carga del modelo
-├── ml/artifacts/            # Archivos del modelo entrenado
-├── tests/                   # Pruebas con pytest contra la API real
-└── .vscode/                 # Configuración de VS Code del proyecto y extensiones recomendadas
+ ┣ 📜 main.py          # Punto de entrada
+ ┣ 📂 app/             # Un módulo por carpeta: auth, user, role, prediction, batch, model...
+ ┣ 📂 config/          # Variables de entorno, base de datos, rutas y datos iniciales
+ ┣ 📂 utils/           # Tokens, contraseñas, límites y carga del modelo
+ ┣ 📂 ml/artifacts/    # Modelo entrenado
+ ┗ 📂 tests/           # Pruebas con pytest
 ```
 
-## 🔐 Roles y permisos
-
-- **root**: puede hacer todo. Es el único que gestiona usuarios y roles y ve los datos de todos.
-- **Los demás usuarios** tienen los permisos de sus roles y solo ven sus propios lotes y predicciones. Un usuario puede tener varios roles; sus permisos se suman.
-
-## 🛠️ Scripts
-
-- Crear un usuario o cambiar su contraseña (por ejemplo, si se olvidó la del root). La pide en la terminal y cierra las sesiones abiertas de ese usuario:
+## 🛠️ Comandos
 
 ```bash
-uv run python -m app.user.create_user <usuario> [--role admin|user]
+pytest                                    # pruebas (SQLite temporal, no toca tu base)
+pyright main.py app config utils          # revisión de tipos
+python -m app.user.create_user <usuario>  # crear usuario o cambiar su contraseña
 ```
 
-- Revisar y formatear el código:
-
-```bash
-uv run ruff check .
-uv run ruff format .
-```
-
-- Correr las pruebas. Por defecto usan SQLite en un archivo temporal, sin tocar tu base:
-
-```bash
-uv run pytest
-```
-
-- Correr las pruebas contra PostgreSQL. Usa una base solo para pruebas: **se borran todas sus tablas**:
-
-```bash
-TEST_DATABASE_URL="postgresql://usuario:clave@localhost:5432/fraud_test" uv run pytest
-```
-
-GitHub Actions corre ruff y las pruebas en cada push a `main`, y solo si pasan se publica en Hugging Face.
 
 ## 🐳 Docker
 
 ```bash
 docker build -t backend-fraud-detector .
+docker run -p 8000:8000 --env-file .env backend-fraud-detector
 ```
-
-<details open>
-<summary><b>macOS / Linux / PowerShell</b></summary>
-
-```bash
-docker run -p 8000:8000 -v ${PWD}/ml/artifacts:/app/ml/artifacts:ro -v ${PWD}/storage:/app/storage --env-file .env backend-fraud-detector
-```
-
-</details>
-
-<details>
-<summary><b>Windows (cmd)</b></summary>
-
-```cmd
-docker run -p 8000:8000 -v %cd%/ml/artifacts:/app/ml/artifacts:ro -v %cd%/storage:/app/storage --env-file .env backend-fraud-detector
-```
-
-</details>
-
-## 🔗 Proyectos relacionados
-
-| Repositorio | Descripción |
-|---|---|
-| [ml-fraud-training](https://github.com/Crypt0xDev/ml-fraud-training) | Análisis de datos, entrenamiento y comparación de modelos |
-| [frontend-fraud-detector](https://github.com/Crypt0xDev/frontend-fraud-detector) | Dashboard en Next.js, React, TypeScript y Tailwind CSS |
 
 ## 📄 Licencia
 
-[MIT](LICENSE) - Universidad Nacional de San Martín - Tarapoto - Perú
+[MIT](LICENSE) · Universidad Nacional de San Martín · Tarapoto · Perú
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0EA5E9,100:4F46E5&height=120&section=footer" alt="footer" width="100%"/>
