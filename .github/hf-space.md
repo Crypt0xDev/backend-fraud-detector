@@ -5,7 +5,7 @@ colorFrom: indigo
 colorTo: gray
 sdk: gradio
 sdk_version: "6.15.2"
-python_version: "3.13"
+python_version: "3.12.12"
 app_file: space.py
 pinned: false
 license: mit
