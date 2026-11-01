@@ -54,6 +54,8 @@ jobs:
         run: |
           cat .github/hf-space.md README.md > README.hf && mv README.hf README.md
           sed -i 's/^xgboost==/xgboost-cpu==/' requirements.txt
+          # gradio[mcp], que instala Hugging Face, exige pydantic<=2.12.5
+          sed -i 's/^pydantic==.*/pydantic==2.12.5/' requirements.txt
           # El SDK Gradio ejecuta space.py: sirve la API en el puerto 7860
           cat > space.py <<'EOF'
           import uvicorn
