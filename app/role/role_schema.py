@@ -1,14 +1,21 @@
 from __future__ import annotations
 
+# python
 from datetime import datetime
+from typing import Literal
 
+# pydantic
 from pydantic import BaseModel, Field, field_validator
 
+# dependencias
 from utils.schemas import BaseSchema
 
 # Rol que se le da a un usuario si no se elige otro
 ANALYST_ROLE = "Analista"
 
+RoleState = Literal["Activo", "Eliminado"]
+ROLE_ACTIVE: RoleState = "Activo"
+ROLE_DELETED: RoleState = "Eliminado"
 
 # Inicio del registro de un rol
 class SchemaRoleCreate(BaseSchema):
@@ -22,18 +29,12 @@ class SchemaRoleCreate(BaseSchema):
         if len(v) != len(set(v)):
             raise ValueError("Los IDs de permisos no pueden repetirse")
         return v
-
-
 # Fin del registro de un rol
-
 
 # Inicio del actualizar
 class SchemaRoleUpdate(SchemaRoleCreate):
     pass
-
-
 # Fin del actualizar
-
 
 # Inicio del response
 class SchemaRoleBasic(BaseModel):
@@ -41,7 +42,6 @@ class SchemaRoleBasic(BaseModel):
     name: str
 
     model_config = {"from_attributes": True}
-
 
 class SchemaRoleResponse(BaseModel):
     id: int
@@ -52,16 +52,12 @@ class SchemaRoleResponse(BaseModel):
     module_permission_ids: list[int] = []
     # Por ejemplo {"lotes": ["ver", "eliminar"]}
     permissions: dict[str, list[str]] = {}
-
-
 # Fin del response
-
 
 # Inicio del árbol de módulos con permisos
 class ModulePermissionItemResponse(BaseModel):
     id: int
     name: str
-
 
 class ModuleTreeResponse(BaseModel):
     """Módulo del árbol: hijos si es padre, si no permisos"""
@@ -99,7 +95,6 @@ class ModuleTreeResponse(BaseModel):
             for module in modules
             if module.parent_id == parent_id
         ]
-
 
 ModuleTreeResponse.model_rebuild()
 # Fin del árbol de módulos con permisos
