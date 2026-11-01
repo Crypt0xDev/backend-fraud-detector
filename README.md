@@ -19,6 +19,11 @@
 <a href="https://github.com/Crypt0xDev/ml-fraud-training"><img src="https://img.shields.io/badge/🧠_Entrenamiento-del_modelo-8B5CF6?style=flat-square" alt="Entrenamiento"/></a>
 <a href="https://github.com/Crypt0xDev/frontend-fraud-detector"><img src="https://img.shields.io/badge/💻_Frontend-Next.js-000000?style=flat-square" alt="Frontend"/></a>
 
+![GitHub stars](https://img.shields.io/github/stars/Crypt0xDev/backend-fraud-detector)
+![GitHub PRs](https://img.shields.io/github/issues-pr/Crypt0xDev/backend-fraud-detector)
+![GitHub forks](https://img.shields.io/github/forks/Crypt0xDev/backend-fraud-detector)
+![GitHub issues](https://img.shields.io/github/issues/Crypt0xDev/backend-fraud-detector)
+
 </div>
 
 ---
@@ -87,8 +92,6 @@ Todas están en [`.env.example`](.env.example). Las principales:
 | `SUPABASE_URL` · `SUPABASE_SECRET_KEY` | Project Settings → API Keys |
 | `MAX_PREDICT_ROWS` | Límite de transacciones por petición (100 por defecto); los CSV usan su propio límite. |
 | `ADMIN_USERNAME` · `ADMIN_PASSWORD` | Admin inicial, solo si no hay ningún root; los demás usuarios se crean desde la API. |
-| `TRUSTED_PROXIES` | IPs del frontend (por defecto `127.0.0.1,::1`). Solo a ellas se les cree `X-Forwarded-For` para limitar los intentos de login por IP real; en Docker, pon la IP del contenedor del frontend. |
-| `DOCS_ENABLED` | `true` por defecto. Con `false` se apagan `/docs`, `/redoc` y `/openapi.json`; conviene en producción. |
 
 > [!IMPORTANT]
 > Nunca subas tu `.env` al repositorio: tiene contraseñas y claves.
@@ -119,6 +122,14 @@ python -m app.user.create_user <usuario>  # crear usuario o cambiar su contrase�
 docker build -t backend-fraud-detector .
 docker run -p 8000:8000 --env-file .env backend-fraud-detector
 ```
+
+## 🫂 Contribuidores
+
+<a href="https://github.com/Crypt0xDev" title="Crypt0xDev"><img src="https://images.weserv.nl/?url=github.com/Crypt0xDev.png&w=128&h=128&fit=cover&mask=circle&maxage=7d" width="64" alt="Crypt0xDev"/></a>
+<a href="https://github.com/AdollaSakura" title="Andrea Garcia"><img src="https://images.weserv.nl/?url=github.com/AdollaSakura.png&w=128&h=128&fit=cover&mask=circle&maxage=7d" width="64" alt="Andrea Garcia"/></a>
+<a href="https://github.com/Lz-27" title="Lz-27"><img src="https://images.weserv.nl/?url=github.com/Lz-27.png&w=128&h=128&fit=cover&mask=circle&maxage=7d" width="64" alt="Lz-27"/></a>
+
+<p></p>
 
 ## 📄 Licencia
 
