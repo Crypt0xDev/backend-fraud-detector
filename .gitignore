@@ -1,11 +1,10 @@
-# Entorno local y secretos: nunca se suben
+# Entorno local y secretos
 .venv/
 .env
 .env.*
-# La plantilla sí se sube, para saber qué variables hay que definir
 !.env.example
 
-# Artefactos del modelo: se ignora todo menos lo que la API usa
+# Artefactos del modelo
 ml/artifacts/*
 !ml/artifacts/pipeline.joblib
 !ml/artifacts/metrics.json
@@ -13,23 +12,21 @@ ml/artifacts/*
 !ml/artifacts/dataset_profile.json
 !ml/artifacts/sample.csv
 
-# Archivos que Python y las herramientas generan solos
+# Archivos de Python
 __pycache__/
 *.py[cod]
-.ruff_cache/
 .pytest_cache/
 
-# Editor: de .vscode solo se sube la configuración del proyecto,
-# lo demás es de cada persona
+# IDE
 .vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json
 !.vscode/launch.json
 .idea/
 
-# Archivos del sistema operativo
+# Archivos
 .DS_Store
 Thumbs.db
 
-# CSV de lotes guardados en local
+# CSV
 storage/

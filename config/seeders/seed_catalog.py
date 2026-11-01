@@ -1,5 +1,6 @@
 import logging
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.module.module_entity import Module, ModulePermission
@@ -13,10 +14,9 @@ PERMISSIONS = ("ver", "crear", "editar", "eliminar")
 MODULES = (
     ("lotes", "Lotes", "folder", "/lotes", ("ver", "eliminar")),
     ("predicciones", "Predicciones", "activity", "/predicciones", ("ver", "crear")),
-    ("modelo", "Modelo", "cpu", "/modelo", ("ver",)),
+    ("modelo", "Modelo", "cpu", "/modelo", ("ver", "editar")),
     ("visualizacion", "Visualización", "chart", "/visualizacion", ("ver",)),
 )
-
 
 def seed_catalog(db: Session) -> None:
     """Crea los permisos y los módulos si todavía no existen"""
@@ -24,7 +24,7 @@ def seed_catalog(db: Session) -> None:
 
     permissions: dict[str, Permission] = {}
     for name in PERMISSIONS:
-        permission = db.query(Permission).filter(Permission.name == name).first()
+        permission = db.scalars(select(Permission).where(Permission.name == name)).first()
         if not permission:
             permission = Permission(name=name)
             db.add(permission)
@@ -33,21 +33,19 @@ def seed_catalog(db: Session) -> None:
         permissions[name] = permission
 
     for code, name, icon, path, actions in MODULES:
-        module = db.query(Module).filter(Module.code == code).first()
+        module = db.scalars(select(Module).where(Module.code == code)).first()
         if not module:
             module = Module(code=code, name=name, icon=icon, path=path, is_parent=False)
             db.add(module)
             db.flush()
             inserted += 1
         for action in actions:
-            exists = (
-                db.query(ModulePermission)
-                .filter(
+            exists = db.scalars(
+                select(ModulePermission).where(
                     ModulePermission.module_id == module.id,
                     ModulePermission.permission_id == permissions[action].id,
                 )
-                .first()
-            )
+            ).first()
             if not exists:
                 db.add(
                     ModulePermission(
@@ -60,4 +58,4 @@ def seed_catalog(db: Session) -> None:
     if inserted:
         logger.info("✅ Catálogo: %s registro(s) insertado(s)", inserted)
     else:
-        logger.info("ℹ️  Catálogo: todos los registros ya existen")
+        logger.debug("ℹ️  Catálogo: todos los registros ya existen")

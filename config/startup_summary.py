@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 WIDTH = 60
 
-
 def describe_database(database_url: str | None, engine: Any) -> str:
     if not database_url or engine is None:
         return "no configurada (login e historial no disponibles)"
@@ -20,14 +19,12 @@ def describe_database(database_url: str | None, engine: Any) -> str:
     where = "Supabase" if "supabase" in (url.hostname or "") else "PostgreSQL local"
     return f"{where} · {name} en {url.hostname}:{url.port or 5432}"
 
-
 def describe_storage(storage: Any) -> str:
     if isinstance(storage, LocalStorage):
         return f"local · {storage.root}"
     if isinstance(storage, SupabaseStorage):
         return f"Supabase · bucket {storage.bucket}"
     return "desactivado (los lotes no se guardan)"
-
 
 def describe_model(model: Any, metrics: Any, policy: Any) -> list[str]:
     if model is None:
@@ -46,6 +43,10 @@ def describe_model(model: Any, metrics: Any, policy: Any) -> list[str]:
         lines.append(f"PR-AUC {info['pr_auc']:.4f}")
     return [" · ".join(lines)]
 
+def describe_sample(sample: Any) -> str:
+    if sample is None:
+        return "no disponible (falta ml/artifacts/sample.csv)"
+    return f"muestra de {len(sample):,} transacciones".replace(",", ".")
 
 def build_summary(state: Any, settings: Settings) -> str:
     api = f"{settings.api_public_url.rstrip('/')}{API_PREFIX}"
@@ -56,6 +57,7 @@ def build_summary(state: Any, settings: Settings) -> str:
             ("Modelo", line)
             for line in describe_model(state.model, state.metrics, state.policy)
         ),
+        ("Visualización", describe_sample(getattr(state, "sample", None))),
         ("API", api),
         ("Docs", f"{settings.api_public_url.rstrip('/')}/docs"),
     ]
@@ -64,7 +66,6 @@ def build_summary(state: Any, settings: Settings) -> str:
     lines += [f"  {label:<14}: {value}" for label, value in rows]
     lines.append("=" * WIDTH)
     return "\n".join(lines)
-
 
 def log_startup_summary(state: Any, settings: Settings) -> None:
     if logger.isEnabledFor(logging.INFO):

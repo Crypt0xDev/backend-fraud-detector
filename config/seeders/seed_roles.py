@@ -1,5 +1,6 @@
 import logging
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.module.module_entity import Module, ModulePermission
@@ -9,7 +10,6 @@ from app.role.role_schema import ANALYST_ROLE
 
 logger = logging.getLogger(__name__)
 
-# Permisos del rol Analista, el que se da por defecto
 ANALYST_PERMISSIONS = {
     "lotes": ("ver", "eliminar"),
     "predicciones": ("ver", "crear"),
@@ -17,11 +17,10 @@ ANALYST_PERMISSIONS = {
     "visualizacion": ("ver",),
 }
 
-
 def seed_roles(db: Session) -> None:
     """Crea el rol Analista si no existe"""
-    if db.query(Role).filter(Role.name == ANALYST_ROLE).first():
-        logger.info("ℹ️  Rol %s: ya existe", ANALYST_ROLE)
+    if db.scalars(select(Role).where(Role.name == ANALYST_ROLE)).first():
+        logger.debug("ℹ️  Rol %s: ya existe", ANALYST_ROLE)
         return
 
     role = Role(
@@ -31,13 +30,12 @@ def seed_roles(db: Session) -> None:
     db.add(role)
     db.flush()
     for code, actions in ANALYST_PERMISSIONS.items():
-        module_permissions = (
-            db.query(ModulePermission)
+        module_permissions = db.scalars(
+            select(ModulePermission)
             .join(Module)
             .join(Permission)
-            .filter(Module.code == code, Permission.name.in_(actions))
-            .all()
-        )
+            .where(Module.code == code, Permission.name.in_(actions))
+        ).all()
         for module_permission in module_permissions:
             db.add(
                 RolePermission(
