@@ -4,20 +4,29 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 # dependencias
+from config.database import get_db
+from config.settings import settings
 from app.auth.auth_dependency import get_current_user, user_permissions
-
-# esquemas
-from app.auth.auth_schema import TokenOut, UserOut
 
 # casos de uso
 from app.auth.usecases.use_auth_login import execute as login_execute
 
 # entidades
 from app.user.user_entity import User
-from config.database import get_db
+
+# esquemas
+from app.auth.auth_schema import TokenOut, UserOut
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
+def client_ip(request: Request) -> str | None:
+    """IP del navegador; detrás del frontend llega en X-Forwarded-For (la última es la que agregó el proxy)"""
+    host = request.client.host if request.client else None
+    if host in settings.trusted_proxies_set:
+        forwarded = [ip.strip() for ip in request.headers.get("x-forwarded-for", "").split(",") if ip.strip()]
+        if forwarded:
+            return forwarded[-1]
+    return host
 
 @router.post("/login", response_model=TokenOut)
 def login_endpoint(
@@ -30,9 +39,8 @@ def login_endpoint(
         db=db,
         username=form.username,
         password=form.password,
-        client_ip=request.client.host if request.client else None,
+        client_ip=client_ip(request),
     )
-
 
 @router.get("/me", response_model=UserOut)
 def me_endpoint(

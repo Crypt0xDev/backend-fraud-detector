@@ -1,5 +1,6 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.module.module_entity import Module, ModulePermission
@@ -31,9 +32,9 @@ def get_current_user(
     username, version = claims
 
     # Si se deshabilita al usuario o cambia su contraseña, se cierran sus sesiones
-    user = (
-        db.query(User).filter(User.username == username, User.state == ACTIVE).first()
-    )
+    user = db.scalars(
+        select(User).where(User.username == username, User.state == ACTIVE)
+    ).first()
     if user is None or user.token_version != version:
         raise credentials_exception
     return user
@@ -44,6 +45,7 @@ def is_root(user: User) -> bool:
 
 
 def get_current_root(current_user: User = Depends(get_current_user)) -> User:
+    """Exige que el usuario sea root; se usa en las rutas de usuarios y roles"""
     if not is_root(current_user):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -56,7 +58,7 @@ def user_permissions(db: Session, user: User) -> dict[str, list[str]]:
     """Permisos de todos los roles del usuario; el root los tiene todos"""
     # Los ids van en el SELECT porque PostgreSQL exige que DISTINCT incluya el ORDER BY
     query = (
-        db.query(Module.code, Permission.name, Module.id, Permission.id)
+        select(Module.code, Permission.name, Module.id, Permission.id)
         .join(ModulePermission, ModulePermission.module_id == Module.id)
         .join(Permission, Permission.id == ModulePermission.permission_id)
     )
@@ -67,32 +69,32 @@ def user_permissions(db: Session, user: User) -> dict[str, list[str]]:
                 RolePermission.module_permission_id == ModulePermission.id,
             )
             .join(UserRole, UserRole.role_id == RolePermission.role_id)
-            .filter(UserRole.username == user.username)
+            .where(UserRole.username == user.username)
         )
     result: dict[str, list[str]] = {}
-    for code, action, _, _ in query.order_by(Module.id, Permission.id).distinct():
+    for code, action, _, _ in db.execute(query.order_by(Module.id, Permission.id).distinct()):
         result.setdefault(code, []).append(action)
     return result
 
 
 def has_permission(db: Session, user: User, module_code: str, action: str) -> bool:
     """True si alguno de sus roles le permite hacer esa acción en el módulo"""
-    return (
-        db.query(UserRole.id)
+    query = (
+        select(UserRole.id)
         .join(RolePermission, RolePermission.role_id == UserRole.role_id)
         .join(
             ModulePermission, ModulePermission.id == RolePermission.module_permission_id
         )
         .join(Module, Module.id == ModulePermission.module_id)
         .join(Permission, Permission.id == ModulePermission.permission_id)
-        .filter(
+        .where(
             UserRole.username == user.username,
             Module.code == module_code,
             Permission.name == action,
         )
-        .first()
-        is not None
+        .limit(1)
     )
+    return db.scalars(query).first() is not None
 
 
 def require_permission(module_code: str, action: str):
