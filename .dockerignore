@@ -1,25 +1,23 @@
-# Lo que NO se copia a la imagen de Docker
-
-# Git y configuración del editor
+# Git y Github
 .git
 .github
+
+# IDE
 .vscode
 
-# Entorno local y secretos: en producción las variables las pone el servidor
+# Entorno local y secretos
 .venv
 .env
 .env.*
 
-# Archivos que Python y las herramientas generan solos
+# Archivos de Python
 __pycache__
-.ruff_cache
 .pytest_cache
 
-# Pruebas: la API no las necesita para funcionar
+# Pruebas y tests
 tests
 pytest.ini
-requirements-dev.txt
 
-# El propio Dockerfile y los CSV guardados en local
+# Dockerfile y CSV
 Dockerfile
 storage
