@@ -1,38 +1,32 @@
-from collections.abc import Sequence
-
+from fastapi import HTTPException, status
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.user.usecases.use_user_roles import ensure_not_last_root, user_not_found
+from app.user.usecases.use_user_roles import ensure_not_last_root
 from app.user.user_entity import User
-from app.user.user_port import UserDataCleaner
-from utils.errors import ConflictError, StorageFailureError
-from utils.storage import StorageError
+from app.user.user_schema import DELETED
+from utils.helpers import utcnow
 
 
-def execute(
-    db: Session,
-    current_user: User,
-    username: str,
-    cleaners: Sequence[UserDataCleaner],
-) -> None:
-    """Borra el usuario"""
-    db_user = db.query(User).filter(User.username == username).first()
+def execute(db: Session, current_user: User, username: str) -> bool:
+    if current_user.username == username:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="No puedes eliminarte a ti mismo"
+        )
+
+    db_user = db.scalars(select(User).where(User.username == username, User.state != DELETED)).first()
+
     if db_user is None:
-        raise user_not_found()
+        return False
 
-    # Verificar que no se borre a sí mismo ni al último root
-    if username == current_user.username:
-        raise ConflictError("No puedes borrar tu propio usuario")
+    # Verificar que no se elimine al último root
     ensure_not_last_root(db, db_user)
 
-    # Borrar los archivos del usuario antes que la cuenta
-    try:
-        for cleaner in cleaners:
-            cleaner.delete_user_data(db, username)
-    except StorageError as error:
-        raise StorageFailureError(
-            "No se pudieron borrar los archivos del usuario"
-        ) from error
-
-    db.delete(db_user)
+    # Borrado lógico: sus lotes y predicciones se quedan guardados
+    db_user.state = DELETED
+    db_user.deleted_at = utcnow()
+    # Cierra sus sesiones abiertas
+    db_user.token_version += 1
     db.commit()
+    return True

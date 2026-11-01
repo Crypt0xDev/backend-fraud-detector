@@ -1,35 +1,36 @@
+from fastapi import HTTPException, status
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.user.usecases.use_user_roles import (
-    default_roles,
-    ensure_not_last_root,
-    resolve_roles,
-    user_not_found,
-)
+from app.user.usecases.use_user_roles import default_roles, ensure_not_last_root, resolve_roles
 from app.user.user_entity import User
-from app.user.user_schema import SchemaUpdate
-from utils.errors import ConflictError, InvalidDataError
+from app.user.user_schema import DELETED, SchemaUpdate
 from utils.helpers import utcnow
 from utils.password import hash_password
 
 
-def execute(
-    db: Session, current_user: User, username: str, user_data: SchemaUpdate
-) -> User:
+def execute(db: Session, current_user: User, username: str, user_data: SchemaUpdate) -> User | None:
     root = user_data.root
 
-    # Validar que se pida algún cambio
+    # Verificar que se pida algún cambio
     if root is None and user_data.password is None and user_data.role_ids is None:
-        raise InvalidDataError("Indica una contraseña nueva, root o los roles")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail="Indica una contraseña nueva, root o los roles"
+        )
 
-    db_user = db.query(User).filter(User.username == username).first()
+    db_user = db.scalars(select(User).where(User.username == username, User.state != DELETED)).first()
+
     if db_user is None:
-        raise user_not_found()
+        return None
 
-    # El root no puede quitarse el root a sí mismo ni dejar el sistema sin root
+    # Verificar que el root no se quite el root a sí mismo ni deje el sistema sin root
     if root is False and db_user.root:
         if username == current_user.username:
-            raise ConflictError("No puedes quitarte tu propio acceso de administrador")
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="No puedes quitarte tu propio acceso de administrador"
+            )
         ensure_not_last_root(db, db_user)
 
     if user_data.password is not None:

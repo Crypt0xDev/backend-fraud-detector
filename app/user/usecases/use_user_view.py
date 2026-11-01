@@ -1,11 +1,9 @@
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.orm import Session, selectinload
 
-from app.user.usecases.use_user_roles import user_not_found
 from app.user.user_entity import User
+from app.user.user_schema import DELETED
 
 
-def execute(db: Session, username: str) -> User:
-    db_user = db.query(User).filter(User.username == username).first()
-    if db_user is None:
-        raise user_not_found()
-    return db_user
+def execute(db: Session, username: str) -> User | None:
+    return db.scalars(select(User).options(selectinload(User.roles)).where(User.username == username, User.state != DELETED)).first()

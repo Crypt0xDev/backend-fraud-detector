@@ -1,18 +1,23 @@
+# python
 import re
 from datetime import datetime
 from typing import Literal
 
+# pydantic
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
-from app.role.role_schema import SchemaRoleBasic
+# dependencias
 from utils.password import MIN_PASSWORD_LENGTH
 from utils.schemas import BaseSchema
 
-UserState = Literal["Activo", "Inactivo"]
-ACTIVE: UserState = "Activo"
-INACTIVE: UserState = "Inactivo"
+# esquemas
+from app.role.role_schema import SchemaRoleBasic
 
-# Va en la URL (/users/{username}): sin "/", espacios ni nombres como ".."
+UserState = Literal["Activo", "Deshabilitado", "Eliminado"]
+ACTIVE: UserState = "Activo"
+DISABLED: UserState = "Deshabilitado"
+DELETED: UserState = "Eliminado"
+
 USERNAME_CHARS = re.compile(r"[\w.@-]+")
 
 
@@ -27,7 +32,6 @@ class SchemaCreate(BaseSchema):
     username: str = Field(..., min_length=1, max_length=150)
     password: str = Field(..., min_length=MIN_PASSWORD_LENGTH)
     root: bool = False
-    # Si no se envían roles, se le da Analista
     role_ids: list[int] = Field(default_factory=list)
 
     @field_validator("username")
@@ -41,8 +45,6 @@ class SchemaCreate(BaseSchema):
         if len(v) != len(set(v)):
             raise ValueError("Los role_ids no pueden repetirse")
         return v
-
-
 # Fin del registro de un usuario
 
 
@@ -59,8 +61,6 @@ class SchemaUpdate(BaseSchema):
         if v is not None and len(v) != len(set(v)):
             raise ValueError("Los role_ids no pueden repetirse")
         return v
-
-
 # Fin del actualizar
 
 
@@ -76,8 +76,6 @@ class SchemaChangePassword(BaseSchema):
         if "new_password" in info.data and v != info.data["new_password"]:
             raise ValueError("Las contraseñas no coinciden")
         return v
-
-
 # Fin del cambio de contraseña
 
 
@@ -91,6 +89,13 @@ class SchemaResponse(BaseModel):
     updated_at: datetime | None = None
 
     model_config = {"from_attributes": True}
-
-
 # Fin del response
+
+
+# Inicio del response de la lista
+class UserPageOut(BaseModel):
+    items: list[SchemaResponse]
+    total: int
+    page: int
+    page_size: int
+# Fin del response de la lista
