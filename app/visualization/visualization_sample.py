@@ -25,7 +25,7 @@ COLUMNS: dict[Hashable, str] = {
 
 def load_sample(path: Path) -> pd.DataFrame | None:
     if not path.exists():
-        logger.warning("No se encontró la muestra de visualización en %s", path)
+        logger.debug("No se encontró la muestra de visualización en %s", path)
         return None
     try:
         return pd.read_csv(path, usecols=list(COLUMNS), dtype=COLUMNS)

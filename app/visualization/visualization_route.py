@@ -1,21 +1,16 @@
-from typing import Annotated
-
 # fastapi
 from fastapi import APIRouter, Depends, Query, Request
+from typing import Annotated
 
 # dependencias
 from app.auth.auth_dependency import require_permission
 
+# casos de uso
+from app.visualization.usecases.use_visualization_profile import execute as profile_visualization_execute
+from app.visualization.usecases.use_visualization_sample import execute as sample_visualization_execute
+
 # esquemas
 from app.prediction.prediction_schema import TransactionType
-
-# casos de uso
-from app.visualization.usecases.use_visualization_profile import (
-    execute as profile_visualization_execute,
-)
-from app.visualization.usecases.use_visualization_sample import (
-    execute as sample_visualization_execute,
-)
 from app.visualization.visualization_schema import DatasetProfileOut, SampleOut
 
 router = APIRouter(

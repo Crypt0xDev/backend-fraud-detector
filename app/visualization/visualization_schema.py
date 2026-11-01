@@ -1,7 +1,10 @@
+# python
 from typing import Any, Literal
 
+# pydantic
 from pydantic import BaseModel, ConfigDict
 
+# esquemas
 from app.prediction.prediction_schema import TransactionType
 
 
