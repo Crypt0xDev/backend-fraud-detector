@@ -1,11 +1,14 @@
+# python
 from datetime import datetime
 from typing import Literal
 from uuid import UUID
 
+# pydantic
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.prediction.prediction_policy import RiskLevel
+# dependencias
 from config.settings import settings
+from app.prediction.prediction_policy import RiskLevel
 
 TransactionType = Literal["CASH_IN", "CASH_OUT", "DEBIT", "PAYMENT", "TRANSFER"]
 
@@ -13,6 +16,7 @@ TransactionType = Literal["CASH_IN", "CASH_OUT", "DEBIT", "PAYMENT", "TRANSFER"]
 MAX_NAME_LENGTH = 100
 
 
+# Inicio del registro de una predicción
 class Transaction(BaseModel):
     """Una transacción con las columnas de PaySim"""
 
@@ -32,10 +36,12 @@ class Transaction(BaseModel):
 
 class PredictIn(BaseModel):
     transactions: list[Transaction] = Field(
-        min_length=1, max_length=settings.max_batch_rows
+        min_length=1, max_length=settings.max_predict_rows
     )
+# Fin del registro de una predicción
 
 
+# Inicio del response de la predicción
 class Contribution(BaseModel):
     """Cuánto sube o baja una variable el score (no es la causa del fraude)"""
 
@@ -64,8 +70,10 @@ class PredictOut(BaseModel):
     batch_id: UUID | None = None
     risk_levels: RiskLevelsOut | None = None
     model_version: str | None = None
+# Fin del response de la predicción
 
 
+# Inicio del response del historial
 class PredictionRecordOut(BaseModel):
     id: UUID
     username: str
@@ -76,10 +84,15 @@ class PredictionRecordOut(BaseModel):
     fraud_probability: float
     is_fraud: bool
     threshold: float
+    model_version: str | None = None
     created_at: datetime
 
 
 class PredictionHistoryOut(BaseModel):
+    # total y flagged cuentan todo el historial, aunque se pida alerts_only
     total: int
     flagged: int
+    page: int
+    page_size: int
     items: list[PredictionRecordOut]
+# Fin del response del historial

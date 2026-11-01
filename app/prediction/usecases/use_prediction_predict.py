@@ -85,6 +85,7 @@ def save_history(
                 fraud_probability=p.fraud_probability,
                 is_fraud=p.is_fraud,
                 threshold=result.threshold,
+                model_version=result.model_version,
             )
             for t, p in zip(transactions, result.predictions, strict=True)
         )

@@ -1,7 +1,9 @@
 import io
-from typing import IO, Any
+from typing import IO, Any, cast
 
 import pandas as pd
+from fastapi import HTTPException, status
+from fastapi.encoders import jsonable_encoder
 from pydantic import TypeAdapter, ValidationError
 from sqlalchemy.orm import Session
 
@@ -10,7 +12,7 @@ from app.prediction.prediction_port import BatchArchive
 from app.prediction.prediction_schema import Prediction, PredictOut, Transaction
 from app.prediction.usecases.use_prediction_predict import predict_transactions
 from app.user.user_entity import User
-from utils.errors import InvalidDataError, InvalidRowsError
+from config.error_handlers import json_safe
 
 transactions_adapter = TypeAdapter(list[Transaction])
 
@@ -72,15 +74,21 @@ def execute(
     max_rows: int,
     archive: BatchArchive | None,
     model_version: str | None = None,
-) -> PredictOut:
+):
     """Analiza el CSV y, si hay almacenamiento, lo guarda en el historial"""
+    # Verificar que el CSV se pueda leer y que sus filas sean válidas
     try:
         frame, transactions = read_csv(io.BytesIO(original), max_rows)
     except InvalidCSVError as error:
-        raise InvalidDataError(str(error)) from error
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=str(error)
+        ) from error
     except ValidationError as error:
-        raise InvalidRowsError(
-            error.errors(include_url=False, include_context=False)
+        # El mismo detalle que da FastAPI; json_safe cambia Infinity y NaN por texto
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=json_safe(jsonable_encoder(error.errors(include_url=False, include_context=False)))
         ) from error
 
     result = predict_transactions(
@@ -89,12 +97,13 @@ def execute(
     if archive is not None:
         result.batch_id = archive.save(
             db,
-            username=current_user.username,
+            username=cast(str, current_user.username),
             file_name=file_name,
             original=original,
             predictions=predictions_csv(frame, result.predictions),
             flagged_rows=sum(p.is_fraud for p in result.predictions),
             total_rows=len(result.predictions),
             threshold=result.threshold,
+            model_version=result.model_version,
         )
     return result

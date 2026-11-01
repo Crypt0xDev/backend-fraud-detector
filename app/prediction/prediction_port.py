@@ -18,4 +18,5 @@ class BatchArchive(Protocol):
         flagged_rows: int,
         total_rows: int,
         threshold: float,
+        model_version: str | None = None,
     ) -> UUID | None: ...

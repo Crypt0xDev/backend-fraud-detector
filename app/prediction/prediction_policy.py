@@ -1,6 +1,10 @@
 from dataclasses import dataclass
 from typing import Any, Literal
 
+from sqlalchemy.orm import Session
+
+from app.prediction.prediction_entity import PredictionPolicy
+
 RiskLevel = Literal["low", "medium", "high"]
 DEFAULT_THRESHOLD = 0.5
 
@@ -32,3 +36,15 @@ def build_policy(metrics: Any, override: float | None) -> RiskPolicy:
         high, source = DEFAULT_THRESHOLD, "por defecto"
     medium = min(float(levels.get("medium", high)), high)
     return RiskPolicy(medium=medium, high=high, source=source)
+
+WEB_SOURCE = "web"
+POLICY_ID = 1
+
+
+def current_policy(db: Session, base: RiskPolicy) -> RiskPolicy:
+    """Los umbrales ajustados en la web; si no hay, los del arranque (base).
+    Se leen en cada petición para que todos los workers usen los mismos"""
+    row = db.get(PredictionPolicy, POLICY_ID)
+    if row is None:
+        return base
+    return RiskPolicy(medium=row.medium, high=row.high, source=WEB_SOURCE)
