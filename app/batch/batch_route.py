@@ -1,33 +1,27 @@
-from uuid import UUID
-
 # fastapi
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
+from uuid import UUID
 
 # dependencias
+from config.database import get_db
 from app.auth.auth_dependency import require_permission
 from app.batch.batch_dependency import get_storage
-
-# esquemas
-from app.batch.batch_schema import (
-    BatchFile,
-    BatchFileUrlOut,
-    BatchPageOut,
-    BatchStatsOut,
-)
+from utils.storage import FileStorage, LocalStorage, StorageError
+from utils.token import decode_download_token
 
 # casos de uso
-from app.batch.usecases.use_batch_delete import execute as delete_batch_execute
-from app.batch.usecases.use_batch_file_url import execute as file_url_batch_execute
 from app.batch.usecases.use_batch_list import execute as list_batch_execute
 from app.batch.usecases.use_batch_stats import execute as stats_batch_execute
+from app.batch.usecases.use_batch_file_url import execute as file_url_batch_execute
+from app.batch.usecases.use_batch_delete import execute as delete_batch_execute
 
 # entidades
 from app.user.user_entity import User
-from config.database import get_db
-from utils.storage import FileStorage, LocalStorage, StorageError
-from utils.token import decode_download_token
+
+# esquemas
+from app.batch.batch_schema import BatchFile, BatchPageOut, BatchStatsOut, BatchFileUrlOut
 
 router = APIRouter(prefix="/batches", tags=["batches"])
 
@@ -77,9 +71,10 @@ def file_url_batch_endpoint(
     storage: FileStorage = Depends(get_storage),
 ):
     """Enlace de 5 minutos para descargar el CSV original o el de resultados"""
-    return file_url_batch_execute(
-        db=db, current_user=current_user, storage=storage, batch_id=batch_id, kind=kind
-    )
+    url = file_url_batch_execute(db=db, current_user=current_user, storage=storage, batch_id=batch_id, kind=kind)
+    if url is None:
+        raise not_found()
+    return url
 
 
 @router.get(DOWNLOAD_PATH, response_class=FileResponse)
@@ -119,7 +114,6 @@ def delete_batch_endpoint(
     storage: FileStorage = Depends(get_storage),
 ):
     """Eliminar un lote y sus archivos"""
-    delete_batch_execute(
-        db=db, current_user=current_user, storage=storage, batch_id=batch_id
-    )
+    if not delete_batch_execute(db=db, current_user=current_user, storage=storage, batch_id=batch_id):
+        raise not_found()
     return Response(status_code=status.HTTP_204_NO_CONTENT)

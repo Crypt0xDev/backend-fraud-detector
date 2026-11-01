@@ -21,6 +21,7 @@ def execute(
     flagged_rows: int,
     total_rows: int,
     threshold: float,
+    model_version: str | None = None,
 ) -> UUID | None:
     """Guarda los dos CSV y el lote. Si falla, igual se devuelve el análisis"""
     batch_id = uuid4()
@@ -36,6 +37,7 @@ def execute(
                 total_rows=total_rows,
                 flagged_rows=flagged_rows,
                 threshold=threshold,
+                model_version=model_version,
             )
         )
         db.commit()
