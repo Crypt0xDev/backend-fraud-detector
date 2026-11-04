@@ -1,0 +1,7 @@
+step,type,amount,nameOrig,oldbalanceOrg,newbalanceOrig,nameDest,oldbalanceDest,newbalanceDest
+1,PAYMENT,100.0,C1,500.0,400.0,M1,0.0,0.0
+1,PAYMENT,-50.0,C1,500.0,400.0,M1,0.0,0.0
+1,REFUND,100.0,C1,500.0,400.0,M1,0.0,0.0
+1,PAYMENT,100.0,C1,,400.0,M1,0.0,0.0
+-1,PAYMENT,100.0,C1,500.0,400.0,M1,0.0,0.0
+1,PAYMENT,abc,C1,500.0,400.0,M1,0.0,0.0
